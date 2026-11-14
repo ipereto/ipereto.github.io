@@ -18,12 +18,14 @@
 html,body{margin:0}
 [hidden]{display:none!important}
 img{max-width:100%}
-/* Layout: three-lane journey (education · work · projects) is the spine; everything else hangs off it. Reading column 70ch, modules 1120px. */
+/* Layout: hero with a one-line career strip, then the three-lane journey (education · work · projects), then soft skills as tiles, projects and contact. Modules 1120px. */
 :root{
   --bg:#F2F4F7; --surface:#FFFFFF; --ink:#111827; --ink-2:#4B5563; --line:#D9DEE6; --soft:#E8ECF2;
   --accent:#E8590C; --accent-soft:#FDE9DC; --on-accent:#FFFFFF;
   --edu:#6D3FD8; --edu-soft:#EEE8FC; --work:#0A7286; --work-soft:#DCF0F3; --proj:#E8590C; --proj-soft:#FDE9DC;
+  --sk:#B4235A; --sk-soft:#FBE6EE;
   --ok:#1E7B3E; --ok-soft:#DFF2E5; --bad:#B42318; --bad-soft:#FCE4E1; --off:#C3CAD5;
+  --manila:#FBF0D3; --manila-line:#E2C98C; --manila-chip:#F3E2B5;
   --f-display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;
   --f-body:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --f-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
@@ -32,12 +34,16 @@ img{max-width:100%}
   --bg:#0E1117; --surface:#161B24; --ink:#E7EAF0; --ink-2:#A3ADBD; --line:#2A3140; --soft:#1D2330;
   --accent:#FF8A4C; --accent-soft:#3A2214; --on-accent:#1A0D05;
   --edu:#A98BFF; --edu-soft:#251C42; --work:#4CC3D6; --work-soft:#0F2E35; --proj:#FF8A4C; --proj-soft:#3A2214;
-  --ok:#5ECB8B; --ok-soft:#12321F; --bad:#FF8A80; --bad-soft:#3B1714; --off:#3A4352; color-scheme:dark}}
+  --sk:#FF7AAE; --sk-soft:#3A1726;
+  --ok:#5ECB8B; --ok-soft:#12321F; --bad:#FF8A80; --bad-soft:#3B1714; --off:#3A4352;
+  --manila:#252016; --manila-line:#4A3F26; --manila-chip:#342C1D; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0E1117; --surface:#161B24; --ink:#E7EAF0; --ink-2:#A3ADBD; --line:#2A3140; --soft:#1D2330;
   --accent:#FF8A4C; --accent-soft:#3A2214; --on-accent:#1A0D05;
   --edu:#A98BFF; --edu-soft:#251C42; --work:#4CC3D6; --work-soft:#0F2E35; --proj:#FF8A4C; --proj-soft:#3A2214;
-  --ok:#5ECB8B; --ok-soft:#12321F; --bad:#FF8A80; --bad-soft:#3B1714; --off:#3A4352; color-scheme:dark}
+  --sk:#FF7AAE; --sk-soft:#3A1726;
+  --ok:#5ECB8B; --ok-soft:#12321F; --bad:#FF8A80; --bad-soft:#3B1714; --off:#3A4352;
+  --manila:#252016; --manila-line:#4A3F26; --manila-chip:#342C1D; color-scheme:dark}
 
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -50,7 +56,6 @@ a{color:inherit}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
 [id]{scroll-margin-top:72px}
 .wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-.mono{font-family:var(--f-mono)}
 .eyebrow{font:500 12px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
 
 /* header */
@@ -71,147 +76,71 @@ a{color:inherit}
 .theme svg{width:16px;height:16px}
 
 /* hero */
-.hero .wrap{padding-block:64px 48px;display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:40px;align-items:end}
-.hero h1{font-size:clamp(44px,7.4vw,84px);font-weight:800;letter-spacing:-.02em}
+.hero .wrap{padding-block:56px 40px;display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,.7fr) minmax(0,1.05fr);gap:32px 40px;align-items:end}
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.hmeta{display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px;margin-bottom:22px;font-size:13.5px;color:var(--ink-2)}
+.hmeta .mi{display:inline-flex;align-items:center;gap:6px}
+.hmeta .mi svg{width:15px;height:15px;flex:none}
+.hmeta .city svg{color:var(--bad)} .hmeta .lng svg{color:var(--work)}
+.route{display:flex;align-items:stretch;gap:10px;margin-top:22px;max-width:620px}
+.route .step{flex:1;min-width:0;display:flex;gap:10px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.route .step > svg,.route .step .flagw svg{width:18px;height:18px;flex:none;margin-top:2px}
+.route .step.goal > svg{color:var(--edu)}
+.route .step b{display:block;font:700 11px var(--f-mono);letter-spacing:.08em;text-transform:uppercase}
+.route .step.now b{color:var(--accent)} .route .step.goal b{color:var(--edu)}
+.route .step div span{font-size:13.5px;color:var(--ink);line-height:1.35}
+.route .step .flagw{color:var(--accent)}
+.route .rarrow{align-self:center;font:600 18px var(--f-mono);color:var(--ink-2)}
+@media (max-width:560px){.route{flex-direction:column}.route .rarrow{transform:rotate(90deg);align-self:flex-start;margin-left:16px}}
+
+.avail{display:inline-flex;align-items:center;gap:8px;font:500 13px var(--f-body);color:var(--ok);background:var(--ok-soft);padding:5px 12px;border-radius:999px}
+.avail i{width:8px;height:8px;border-radius:50%;background:var(--ok);animation:pulse 2.2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--ok) 55%,transparent)}70%{box-shadow:0 0 0 9px transparent}100%{box-shadow:0 0 0 0 transparent}}
+.goalpill svg{width:16px;height:16px;color:var(--edu);flex:none}
+.goalpill b{font-weight:700;color:var(--edu)}
+.nowb{font-weight:700;color:var(--accent)}
+.nowpill{display:inline-flex;align-items:center;gap:8px;font:500 13px var(--f-body);color:var(--ink);background:var(--surface);border:1px solid var(--line);padding:4px 12px;border-radius:999px}
+.flagw{display:inline-grid;place-items:center;color:var(--accent)}
+.flagw svg{width:16px;height:16px}
+.toolw svg{animation:none!important;transform-origin:30% 70%}
+@media (prefers-reduced-motion:no-preference){.toolw svg{animation:tinker 2.4s ease-in-out infinite!important}}
+@keyframes tinker{0%,60%,100%{transform:rotate(0)}70%{transform:rotate(-14deg)}80%{transform:rotate(8deg)}90%{transform:rotate(-6deg)}}
+svg .cloth{transform-box:fill-box;transform-origin:left center}
+@media (prefers-reduced-motion:no-preference){svg .cloth{animation:wave 1.4s ease-in-out infinite}.flagw svg{animation:bob 1.4s ease-in-out infinite}}
+@keyframes wave{0%,100%{transform:skewY(0) scaleX(1)}50%{transform:skewY(-12deg) scaleX(.86)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.5px)}}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.langline{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:14.5px;color:var(--ink)}
+.langline svg{width:16px;height:16px;color:var(--accent);flex:none}
+.hero h1{font-size:clamp(40px,5.2vw,66px);font-weight:800;letter-spacing:-.02em}
 .hero h1 em{font-style:normal;color:var(--accent)}
-.role{font:500 15px var(--f-mono);color:var(--ink-2);margin-top:14px}
+.role{font:500 15px var(--f-mono);color:var(--ink-2);margin-top:12px}
 .role b{color:var(--ink);font-weight:500}
-.lead{font-size:18px;color:var(--ink-2);max-width:60ch;margin-top:20px}
-.cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
+.lead{font-size:18px;color:var(--ink-2);max-width:56ch;margin-top:16px}
+.cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
 .btn{display:inline-flex;align-items:center;gap:8px;font:600 14.5px var(--f-body);text-decoration:none;padding:11px 18px;border-radius:10px;border:1.5px solid var(--ink);background:transparent;color:var(--ink);cursor:pointer}
 .btn.primary{background:var(--ink);color:var(--bg)}
 .btn:hover{transform:translateY(-1px)}
-.facts{display:grid;gap:10px}
+.facts{display:grid;gap:12px}
+.brief{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:grid;gap:10px;min-width:0}
+.brief .bh{font:600 11px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2)}
+.brief .row{display:grid;gap:5px}
+.brief .rt{display:flex;flex-wrap:wrap;align-items:center;gap:2px 8px;font:700 14px var(--f-display)}
+.brief .lvl{display:flex;gap:3px}.brief .lvl i{width:14px;height:5px;border-radius:3px;background:var(--line)}.brief .lvl i.on{background:var(--accent)}
+.brief .bt{display:flex;flex-wrap:wrap;gap:4px}
+.brief .bt span{font:500 11px var(--f-mono);background:var(--soft);padding:1px 6px;border-radius:4px}
+.brief .rt small{font:400 11.5px var(--f-body);color:var(--ink-2);margin-left:2px}
+.citypill svg{width:15px;height:15px;color:var(--bad);flex:none}
+.langpill svg{width:15px;height:15px;color:var(--work);flex:none}
 .fact{border-left:3px solid var(--accent);padding:6px 0 6px 14px}
-.fact b{display:block;font:800 34px var(--f-display);letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.fact b{display:block;font:800 36px var(--f-display);letter-spacing:-.01em;font-variant-numeric:tabular-nums}
 .fact span{font-size:14px;color:var(--ink-2)}
-
-/* sections */
-section{padding-block:64px;border-top:1px solid var(--line)}
-.head{display:grid;gap:10px;margin-bottom:28px;max-width:70ch}
-.head h2{font-size:clamp(30px,4.4vw,46px);font-weight:700;letter-spacing:-.01em}
-.head p{color:var(--ink-2)}
-
-/* skill filter */
-.filter{display:grid;gap:12px;margin-bottom:22px}
-.chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{font:500 13px var(--f-body);padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
-.chip:hover{border-color:var(--accent)}
-.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
-.evidence{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-.ev{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:grid;gap:6px;align-content:start;min-width:0}
-.ev .k{font:500 11px var(--f-mono);letter-spacing:.07em;text-transform:uppercase}
-.ev.edu .k{color:var(--edu)} .ev.work .k{color:var(--work)} .ev.proj .k{color:var(--proj)}
-.ev ul{margin:0;padding-left:18px;font-size:14px;display:grid;gap:2px}
-.ev .gap{font-size:14px;color:var(--ink-2)}
-
-/* journey */
-.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--ink-2);margin-bottom:10px}
-.legend span{display:inline-flex;align-items:center;gap:6px}
-.legend i{width:10px;height:10px;border-radius:50%;display:inline-block}
-.legend .edu{background:var(--edu)} .legend .work{background:var(--work)} .legend .proj{background:var(--proj)}
-.lanes-head,.jrow{display:grid;grid-template-columns:78px repeat(3,minmax(0,1fr));column-gap:14px}
-.lanes-head{position:sticky;top:calc(env(safe-area-inset-top,0px) + 53px);z-index:5;background:var(--bg);padding-block:8px;border-bottom:1px solid var(--line)}
-.lanes-head div{font:500 12px var(--f-mono);letter-spacing:.07em;text-transform:uppercase}
-.lanes-head .edu{color:var(--edu)} .lanes-head .work{color:var(--work)} .lanes-head .proj{color:var(--proj)}
-.journey{position:relative}
-.jrow{position:relative}
-.jrow .yr{font:500 13px var(--f-mono);color:var(--ink-2);padding-top:18px;text-align:right;font-variant-numeric:tabular-nums}
-.lane{position:relative;padding-block:8px;min-width:0}
-.lane::before{content:"";position:absolute;left:11px;top:0;bottom:0;width:2px;background:var(--soft)}
-.lane.edu::before{background:color-mix(in srgb,var(--edu) 22%,transparent)}
-.lane.work::before{background:color-mix(in srgb,var(--work) 22%,transparent)}
-.lane.proj::before{background:color-mix(in srgb,var(--proj) 22%,transparent)}
-.item{position:relative;margin-left:28px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;cursor:pointer;transition:opacity .3s,transform .3s,border-color .2s,box-shadow .2s;text-align:left;width:calc(100% - 28px);font:inherit;color:inherit;display:block}
-.item::before{content:"";position:absolute;left:-23px;top:18px;width:12px;height:12px;border-radius:50%;background:var(--surface);border:2.5px solid currentColor}
-.item.edu{color:var(--edu)} .item.work{color:var(--work)} .item.proj{color:var(--proj)}
-.item > *{color:var(--ink)}
-.item:hover{border-color:currentColor}
-.item .when{font:500 11.5px var(--f-mono);color:var(--ink-2);display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-.item .tag{font:500 10.5px var(--f-mono);text-transform:uppercase;letter-spacing:.06em;padding:1px 6px;border-radius:4px}
-.item.edu .tag{background:var(--edu-soft);color:var(--edu)} .item.work .tag{background:var(--work-soft);color:var(--work)} .item.proj .tag{background:var(--proj-soft);color:var(--proj)}
-.item h3{font:700 17px/1.25 var(--f-display);margin-top:4px;letter-spacing:-.005em}
-.item .org{font-size:13.5px;color:var(--ink-2)}
-.item .sum{font-size:14px;color:var(--ink-2);margin-top:6px}
-.item.dim{opacity:.28}
-.item.hit{box-shadow:0 0 0 2px currentColor}
-.item.open{border-color:currentColor;box-shadow:0 0 0 2px currentColor}
-.detail{display:none;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);font-size:14px;color:var(--ink)}
-.item.open .detail{display:grid;gap:8px}
-.detail .lbl{font:500 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2)}
-.detail ul{margin:0;padding-left:18px;display:grid;gap:3px;color:var(--ink)}
-.stack{display:flex;flex-wrap:wrap;gap:5px}
-.stack span{font:500 11.5px var(--f-mono);background:var(--soft);color:var(--ink);padding:2px 7px;border-radius:5px}
-.links{display:flex;flex-wrap:wrap;gap:6px}
-.links button,.links a{font:500 12.5px var(--f-body);border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:6px;padding:3px 9px;cursor:pointer;text-decoration:none}
-.links button:hover,.links a:hover{border-color:var(--accent)}
-.repo{font:500 12px var(--f-mono);display:inline-flex;gap:6px;align-items:center}
-.repo .st{padding:1px 6px;border-radius:4px;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em}
-.st.public{background:var(--ok-soft);color:var(--ok)} .st.private{background:var(--soft);color:var(--ink-2)} .st.pending{background:var(--accent-soft);color:var(--accent)}
-.jtools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:14px 0 6px}
-.pbtn{display:inline-flex;align-items:center;gap:6px;font:500 13.5px var(--f-body);border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:7px 12px;border-radius:8px;cursor:pointer}
-.pbtn:hover{border-color:var(--accent)}
-.pbtn.main{background:var(--ink);border-color:var(--ink);color:var(--bg);min-width:128px;justify-content:center}
-.pbtn svg{width:14px;height:14px;fill:currentColor}
-.pstate{font:500 11.5px var(--f-mono);color:var(--ink-2);text-transform:uppercase;letter-spacing:.06em}
-
-/* projects */
-.feature{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:24px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:24px;margin-bottom:20px}
-.feature h3{font-size:30px;font-weight:700}
-.feature .meta{font:500 12.5px var(--f-mono);color:var(--ink-2)}
-.feature p{color:var(--ink-2);font-size:15.5px}
-.svgbox{border:1px solid var(--line);border-radius:12px;background:var(--bg);overflow-x:auto}
-.svgbox svg{display:block;width:100%;min-width:520px;height:auto}
-.labs{display:flex;flex-wrap:wrap;gap:5px}
-.labs span{font:500 11.5px var(--f-mono);border:1px solid var(--line);border-radius:5px;padding:2px 7px;color:var(--ink-2)}
-.info{font-size:14px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 14px;min-height:46px}
-.pgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-.pcard{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;gap:8px;align-content:start;min-width:0}
-.pcard .y{font:500 12px var(--f-mono);color:var(--ink-2);display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
-.pcard h4{font-size:21px;font-weight:700}
-.pcard p{font-size:14.5px;color:var(--ink-2)}
-.pcard .learn{font-size:14px;color:var(--ink);border-left:3px solid var(--accent);padding-left:10px}
-.role-pill{font:500 10.5px var(--f-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--accent)}
-
-/* svg */
-svg .n rect{fill:var(--surface);stroke:var(--line);stroke-width:1.5}
-svg .n.sel rect{stroke:var(--accent);stroke-width:2.5}
-svg .clk{cursor:pointer}
-svg .t{fill:var(--ink);font:600 13px var(--f-body)}
-svg .s{fill:var(--ink-2);font:400 11px var(--f-body)}
-svg .lb{fill:var(--ink-2);font:500 11px var(--f-mono)}
-svg .lba{fill:var(--accent);font:500 11px var(--f-mono)}
-svg .zone{fill:none;stroke:var(--line);stroke-width:1.5;stroke-dasharray:6 5}
-svg .part{fill:var(--surface);stroke:var(--line);stroke-width:1.2}
-svg .rail{fill:none;stroke:var(--line);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
-svg .cell{stroke:none}
-svg .cell.k0,svg .pt.k0{fill:var(--work)} svg .cell.k1,svg .pt.k1{fill:var(--edu)} svg .cell.k2,svg .pt.k2{fill:var(--proj)}
-svg .pt.bad{fill:var(--bad)}
-svg .pt{stroke:var(--surface);stroke-width:1.5}
-svg .celltx{fill:var(--surface);font:500 10px var(--f-mono)}
-svg .dlt rect{fill:var(--bad-soft);stroke:var(--bad)}
-svg .fx{pointer-events:none}
-
-/* skills */
-.tiers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-.tier{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;gap:10px;align-content:start}
-.tier h4{font-size:19px}
-.tier p{font-size:13.5px;color:var(--ink-2)}
-.tier .stack span{font-size:12.5px;padding:3px 9px}
-.langs{margin-top:16px;font-size:14.5px;color:var(--ink-2)}
-
-/* contact */
-.contact{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
-footer{padding-block:32px;border-top:1px solid var(--line);color:var(--ink-2);font-size:13.5px}
-.avail{display:inline-flex;align-items:center;gap:8px;font:500 13px var(--f-body);color:var(--ok);background:var(--ok-soft);padding:5px 12px;border-radius:999px;margin:0 0 16px;width:max-content;max-width:100%}
-.avail i{width:8px;height:8px;border-radius:50%;background:var(--ok);animation:pulse 2.2s infinite}
-@keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--ok) 55%,transparent)}70%{box-shadow:0 0 0 9px transparent}100%{box-shadow:0 0 0 0 transparent}}
 .strip{grid-column:1/-1;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px 8px;display:grid;gap:6px;min-width:0}
 .strip-head{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;font-size:12.5px;color:var(--ink-2)}
 .strip-head .eyebrow{margin-right:auto;color:var(--ink-2)}
-.sk{display:inline-flex;align-items:center;gap:6px}
-.sk i{width:9px;height:9px;border-radius:50%;display:inline-block}
-.sk i.edu{background:var(--edu)} .sk i.work{background:var(--work)} .sk i.proj{background:var(--proj)}
+.dotk{display:inline-flex;align-items:center;gap:6px}
+.dotk i{width:9px;height:9px;border-radius:50%;display:inline-block}
+.dotk i.edu{background:var(--edu)} .dotk i.work{background:var(--work)} .dotk i.proj{background:var(--proj)}
 .svgwrap{overflow-x:auto}
 .svgwrap svg{display:block;width:100%;min-width:620px;height:auto}
 svg .sg{stroke:var(--line);stroke-width:1;stroke-dasharray:2 4}
@@ -220,57 +149,245 @@ svg .sl{stroke-width:2;opacity:.3} svg .sl.edu{stroke:var(--edu)} svg .sl.work{s
 svg .sb{cursor:pointer;transition:opacity .2s} svg .sb:hover{opacity:.75}
 svg .sb.edu{fill:var(--edu)} svg .sb.work{fill:var(--work)} svg .sb.proj{fill:var(--proj)}
 svg .sb .dot{stroke:var(--surface);stroke-width:2.5}
+
+/* sections */
+section{padding-block:64px;border-top:1px solid var(--line)}
+.head{display:grid;gap:10px;margin-bottom:24px;max-width:68ch}
+.head h2{font-size:clamp(30px,4.4vw,46px);font-weight:700;letter-spacing:-.01em}
+.head p{color:var(--ink-2)}
+
+/* filters */
+.filter{display:grid;gap:10px;margin-bottom:18px}
+.fgroup{display:grid;grid-template-columns:150px minmax(0,1fr);gap:10px;align-items:start}
+.flabel{font:500 11.5px var(--f-mono);letter-spacing:.07em;text-transform:uppercase;color:var(--ink-2);padding-top:7px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:6px;font:500 13px var(--f-body);padding:5px 11px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.chip:hover{border-color:var(--accent)}
+.chip.soft svg{width:14px;height:14px;color:var(--sk)}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.chip[aria-pressed="true"] svg{color:var(--on-accent)}
+.chip .cnt{font:500 11px var(--f-mono);padding:0 6px;border-radius:999px;background:var(--soft);color:var(--ink-2)}
+.chip[aria-pressed="true"] .cnt{background:color-mix(in srgb,var(--on-accent) 25%,transparent);color:var(--on-accent)}
+.evidence{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.ev{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:grid;gap:6px;align-content:start;min-width:0}
+.ev .k{font:500 11px var(--f-mono);letter-spacing:.07em;text-transform:uppercase}
+.ev.edu .k{color:var(--edu)} .ev.work .k{color:var(--work)} .ev.proj .k{color:var(--proj)}
+.ev ul{margin:0;padding-left:18px;font-size:14px;display:grid;gap:2px}
+.ev .gap{font-size:14px;color:var(--ink-2)}
+
+/* journey */
+.jtools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0 10px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;align-items:center;font-size:13px;color:var(--ink-2);margin-bottom:10px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.legend .edu{background:var(--edu)} .legend .work{background:var(--work)} .legend .proj{background:var(--proj)}
+.legend .tk{width:18px;height:12px;border-radius:3px;background:var(--soft);border:1px solid var(--line)}
+.legend .sk{width:18px;height:12px;border-radius:999px;background:var(--sk-soft);border:1px solid var(--sk)}
+.expand{margin-left:auto;font:500 13px var(--f-body);border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:5px 12px;cursor:pointer}
+.expand:hover{border-color:var(--accent)}
+.lanes-head,.jrow{display:grid;grid-template-columns:70px repeat(3,minmax(0,1fr));column-gap:14px}
+.lanes-head{position:sticky;top:calc(env(safe-area-inset-top,0px) + 53px);z-index:5;background:var(--bg);padding-block:8px;border-bottom:1px solid var(--line)}
+.lanes-head div{font:500 12px var(--f-mono);letter-spacing:.07em;text-transform:uppercase}
+.lanes-head .edu{color:var(--edu)} .lanes-head .work{color:var(--work)} .lanes-head .proj{color:var(--proj)}
+.jrow{position:relative}
+.jrow .yr{font:600 14px var(--f-mono);color:var(--ink-2);padding-top:16px;text-align:right;font-variant-numeric:tabular-nums}
+.lane{position:relative;padding-block:8px;min-width:0;display:grid;gap:10px;align-content:start}
+.lane::before{content:"";position:absolute;left:11px;top:0;bottom:0;width:2px}
+.lane.edu::before{background:color-mix(in srgb,var(--edu) 22%,transparent)}
+.lane.work::before{background:color-mix(in srgb,var(--work) 22%,transparent)}
+.lane.proj::before{background:color-mix(in srgb,var(--proj) 22%,transparent)}
+.item{position:relative;margin-left:28px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:11px 13px;cursor:pointer;transition:opacity .3s,border-color .2s,box-shadow .2s,transform .2s;min-width:0}
+.item::before{content:"";position:absolute;left:-23px;top:16px;width:12px;height:12px;border-radius:50%;background:var(--surface);border:2.5px solid currentColor}
+.item.edu{color:var(--edu)} .item.work{color:var(--work)} .item.proj{color:var(--proj)}
+.item > *{color:var(--ink)}
+.item:hover{border-color:currentColor;transform:translateX(2px)}
+.item .when{font:500 11.5px var(--f-mono);color:var(--ink-2);display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.item .when::after{content:"+";margin-left:auto;font:500 15px var(--f-mono);color:var(--ink-2)}
+.item.open > .when::after{content:"\2212"}
+.kids{display:grid;gap:8px;margin-top:10px;padding-left:10px;border-left:2px dashed color-mix(in srgb,var(--edu) 40%,transparent)}
+.lane.spancell{grid-column:span 2}
+.lane.spancell > .item{width:calc(50% - 7px);box-sizing:border-box}
+.lane.spancell > .item:has(> .kids.split){width:auto}
+.kids.split{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:14px;border-left:0;padding-left:0}
+.kcol{display:grid;gap:8px;align-content:start;min-width:0;padding-left:10px;border-left:2px dashed color-mix(in srgb,var(--edu) 40%,transparent)}
+.kcol.kw{border-left-color:color-mix(in srgb,var(--work) 45%,transparent)}
+.item.work{border-left:5px solid var(--work);padding-top:20px}
+.item.work::after{content:"";position:absolute;top:7px;left:50%;width:34px;height:7px;transform:translateX(-50%);border-radius:4px;background:var(--bg);border:1px solid var(--line);box-shadow:inset 0 1px 2px color-mix(in srgb,var(--ink) 18%,transparent)}
+.item.work.kid::after{background:var(--surface)}
+.item.work.kid{padding-top:20px}
+.item.work.kid.inner{border-left-width:1px;padding-top:9px}
+.item.work.kid.inner::after{display:none}
+.item.work > .kids{border-left-color:color-mix(in srgb,var(--work) 45%,transparent)}
+.item.proj > .kids{border-left-color:color-mix(in srgb,var(--proj) 45%,transparent)}
+.item.work > .kmore{color:var(--work)} .item.proj > .kmore{color:var(--proj)}
+.item.cert::after{content:"";position:absolute;top:-1px;right:12px;width:14px;height:30px;background:linear-gradient(90deg,var(--edu) 0 30%,color-mix(in srgb,var(--edu) 70%,var(--surface)) 30% 70%,var(--edu) 70%);clip-path:polygon(0 0,100% 0,100% 100%,50% 76%,0 100%)}
+.item.cert > .when{padding-right:24px}
+.item.dip{outline:1px solid color-mix(in srgb,var(--edu) 30%,transparent);outline-offset:-5px;padding:14px 16px}
+.item.dip.honors{margin-top:16px}
+.seal{position:absolute;top:-16px;right:40px;display:inline-flex;align-items:center;gap:5px;padding:2px 10px 2px 3px;background:var(--surface);border:1px solid color-mix(in srgb,var(--edu) 45%,transparent);border-radius:999px;font:600 9.5px/1.2 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--edu);transform:rotate(-2deg);box-shadow:0 4px 12px -8px color-mix(in srgb,var(--edu) 70%,transparent)}
+.seal svg{width:28px;height:28px;flex:none;margin-block:-4px}
+.item.deliv,.item.deliv.kid{margin-top:15px;border-top-left-radius:0;background:var(--manila);border-color:var(--manila-line)}
+.item.deliv:hover{border-color:currentColor}
+.item.deliv > .ftab{border-color:var(--manila-line)}
+.item.deliv .tt{background:var(--manila-chip)}
+.ftab{position:absolute;left:-1px;bottom:100%;display:inline-flex;align-items:center;gap:5px;padding:3px 11px 1px 8px;background:inherit;border:1px solid var(--line);border-bottom:0;border-radius:9px 9px 0 0;font:600 9.5px/1.2 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);transition:border-color .2s}
+.ftab svg{width:12px;height:12px;flex:none}
+.ftab.public{color:var(--ok)} .ftab.pending{color:var(--accent)}
+.item.deliv.proj:hover > .ftab{border-color:var(--proj)} .item.deliv.edu:hover > .ftab{border-color:var(--edu)}
+.item.kid{margin-left:0;background:var(--bg);padding:9px 11px}
+.item.kid::before{display:none}
+.item.kid h3{font-size:15px}
+.item.kid:hover{transform:none}
+.item .tag{font:500 10.5px var(--f-mono);text-transform:uppercase;letter-spacing:.06em;padding:1px 6px;border-radius:4px}
+.item.edu .tag{background:var(--edu-soft);color:var(--edu)} .item.work .tag{background:var(--work-soft);color:var(--work)} .item.proj .tag{background:var(--proj-soft);color:var(--proj)}
+.item h3{font:700 16.5px/1.25 var(--f-display);margin-top:4px;letter-spacing:-.005em}
+.ihead{all:unset;cursor:pointer}
+.ihead:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
+.item .org{font-size:13px;color:var(--ink-2);margin-top:1px}
+.tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.tt{font:500 11px var(--f-mono);background:var(--soft);color:var(--ink);padding:1px 6px;border-radius:4px}
+.ts{display:inline-flex;align-items:center;gap:4px;font:500 11.5px var(--f-body);color:var(--sk);background:var(--sk-soft);padding:1px 8px 1px 6px;border-radius:999px}
+.ts svg{width:12px;height:12px}
+.item.dim{opacity:.25}
+.item.next{border-style:dashed;border-width:1.5px;background:color-mix(in srgb,var(--proj) 6%,var(--surface))}
+.item.next::before{border-style:dashed}
+.item .tag svg{width:11px;height:11px;vertical-align:-1px;margin-right:4px}
+.item.hit{box-shadow:0 0 0 2px currentColor}
+.item.open{border-color:currentColor;box-shadow:0 0 0 2px currentColor}
+.detail{display:none;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);font-size:14px;color:var(--ink)}
+.item.open > .detail{display:grid;gap:8px}
+.detail .lbl{font:500 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2)}
+.detail ul{margin:0;padding-left:18px;display:grid;gap:3px}
+.detail .sum{color:var(--ink-2)}
+.item .csum{font-size:14px;color:var(--ink);margin-top:8px;max-width:65ch}
+.item.box > .kids{display:none}
+.item.box.open > .kids{display:grid}
+.kmore{margin-top:10px;font:600 12px var(--f-mono);color:var(--edu);display:flex;align-items:center;gap:6px}
+.kmore::before{content:"\25B8";transition:transform .2s}
+.item.open > .kmore::before{transform:rotate(90deg)}
+.kmore .c,.item.open > .kmore .o{display:none}
+.item.open > .kmore .c{display:inline}
+.links{display:flex;flex-wrap:wrap;gap:6px}
+.links button{font:500 12.5px var(--f-body);border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:6px;padding:3px 9px;cursor:pointer}
+.links button:hover{border-color:var(--accent)}
+.repo{font:500 12px var(--f-mono);display:inline-flex;gap:6px;align-items:center;flex-wrap:wrap}
+.repo .st{padding:1px 6px;border-radius:4px;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em}
+.st.public{background:var(--ok-soft);color:var(--ok)} .st.private{background:var(--soft);color:var(--ink-2)} .st.pending{background:var(--accent-soft);color:var(--accent)}
+.pbtn{display:inline-flex;align-items:center;gap:6px;font:500 13.5px var(--f-body);border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:7px 12px;border-radius:8px;cursor:pointer}
+.pbtn:hover{border-color:var(--accent)}
+.pbtn.main{background:var(--ink);border-color:var(--ink);color:var(--bg);min-width:120px;justify-content:center}
+.pbtn svg{width:14px;height:14px;fill:currentColor}
+.pstate{font:500 11.5px var(--f-mono);color:var(--ink-2);text-transform:uppercase;letter-spacing:.06em}
+
+/* soft skills */
+#soft{background:var(--soft)}
+.sgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.stile{all:unset;box-sizing:border-box;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:8px;align-content:start;cursor:pointer;transition:transform .2s,border-color .2s,box-shadow .2s;min-width:0}
+.stile:hover{transform:translateY(-3px);border-color:var(--sk);box-shadow:0 14px 30px -22px color-mix(in srgb,var(--ink) 60%,transparent)}
+.stile:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stile .ico{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--sk-soft);color:var(--sk)}
+.stile .ico svg{width:22px;height:22px}
+.stile h4{font:700 16px/1.2 var(--f-display)}
+.stile p{font-size:13px;color:var(--ink-2)}
+.edots{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-top:2px}
+.edots i{width:9px;height:9px;border-radius:50%;display:inline-block}
+.edots i.edu{background:var(--edu)} .edots i.work{background:var(--work)} .edots i.proj{background:var(--proj)}
+.edots span{font:500 11px var(--f-mono);color:var(--ink-2);margin-left:4px}
+
+/* projects */
+.feature{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:24px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:24px;margin-bottom:20px}
+.feature h3{font-size:30px;font-weight:700}
+.feature .meta{font:500 12.5px var(--f-mono);color:var(--ink-2)}
+.feature p{color:var(--ink-2);font-size:15.5px}
+.svgbox{border:1px solid var(--line);border-radius:12px;background:var(--bg);overflow-x:auto}
+.svgbox svg{display:block;width:100%;min-width:520px;height:auto}
+.labs{display:flex;flex-wrap:wrap;gap:5px}
+.labs span{font:500 11.5px var(--f-mono);border:1px solid var(--line);border-radius:5px;padding:2px 7px;color:var(--ink-2)}
+.info{font-size:14px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 14px;min-height:46px}
+.pgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.pcard{background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:8px;align-content:start;min-width:0;transition:transform .2s,box-shadow .2s}
+.pcard.edu{border-top-color:var(--edu)} .pcard.proj{border-top-color:var(--proj)}
+.pcard:hover{transform:translateY(-3px);box-shadow:0 14px 30px -20px color-mix(in srgb,var(--ink) 60%,transparent)}
+.pcard .y{font:500 12px var(--f-mono);color:var(--ink-2);display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.pcard h4{font-size:20px;font-weight:700}
+.pcard p{font-size:14px;color:var(--ink-2)}
+.role-pill{font:500 10.5px var(--f-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--accent)}
+.pfoot{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;margin-top:auto;padding-top:4px}
+.seej{font:600 13px var(--f-body);border:0;background:none;color:var(--accent);cursor:pointer;padding:2px 0}
+.seej:hover{text-decoration:underline}
+
+/* tech skills */
+.tiers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.tier{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;gap:10px;align-content:start}
+.tier .lvl{display:flex;gap:4px} .tier .lvl i{width:22px;height:6px;border-radius:3px;background:var(--line)} .tier .lvl i.on{background:var(--accent)}
+.tier h4{font-size:19px}
+.tier p{font-size:13.5px;color:var(--ink-2)}
+.tier .tags span{font:500 12.5px var(--f-mono);background:var(--soft);padding:3px 9px;border-radius:5px}
+.langs{margin-top:16px;font-size:14.5px;color:var(--ink-2)}
+
+/* svg diagram */
+svg .n rect{fill:var(--surface);stroke:var(--line);stroke-width:1.5}
+svg .n.sel rect{stroke:var(--accent);stroke-width:2.5}
+svg .clk{cursor:pointer}
+svg .t{fill:var(--ink);font:600 13px var(--f-body)}
+svg .s{fill:var(--ink-2);font:400 11px var(--f-body)}
+svg .lba{fill:var(--accent);font:500 11px var(--f-mono)}
+svg .lb{fill:var(--ink-2);font:500 11px var(--f-mono)}
+svg .zone{fill:none;stroke:var(--line);stroke-width:1.5;stroke-dasharray:6 5}
+svg .part{fill:var(--surface);stroke:var(--line);stroke-width:1.2}
+svg .rail{fill:none;stroke:var(--line);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+svg .cell.k0,svg .pt.k0{fill:var(--work)} svg .cell.k1,svg .pt.k1{fill:var(--edu)} svg .cell.k2,svg .pt.k2{fill:var(--proj)}
+svg .pt.bad{fill:var(--bad)}
+svg .pt{stroke:var(--surface);stroke-width:1.5}
+svg .celltx{fill:var(--surface);font:500 10px var(--f-mono)}
+svg .dlt rect{fill:var(--bad-soft);stroke:var(--bad)}
+svg .fx{pointer-events:none}
+
+/* contact */
+.cbox{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:28px;display:grid;gap:14px;max-width:760px}
+.cbox .big{font:700 clamp(24px,3.4vw,34px)/1.15 var(--f-display)}
+footer{padding-block:32px;border-top:1px solid var(--line);color:var(--ink-2);font-size:13.5px}
+
 @media (prefers-reduced-motion:no-preference){
   svg .sb{transform-box:fill-box;transform-origin:left center;animation:grow .7s cubic-bezier(.2,.8,.2,1) both;animation-delay:var(--d)}
   svg .sb.isdot{transform-origin:center;animation-name:pop}
   @keyframes grow{from{transform:scaleX(0)}}
   @keyframes pop{from{transform:scale(0)}}
   @supports (animation-timeline:view()){
-    .jrow,.pcard,.tier,.feature,section .head{animation:rise linear both;animation-timeline:view();animation-range:entry 0% entry 45%}
+    .jrow,.pcard,.tier,.feature,.stile,section .head{animation:rise linear both;animation-timeline:view();animation-range:entry 0% entry 45%}
     @keyframes rise{from{opacity:.3;transform:translateY(22px)}}
   }
 }
-.ihead{all:unset;cursor:pointer}
-.ihead:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
-.item .when::after{content:"+";margin-left:auto;font:500 15px var(--f-mono);color:var(--ink-2)}
-.item.open .when::after{content:"−"}
-.chip .cnt{font:500 11px var(--f-mono);margin-left:6px;padding:0 6px;border-radius:999px;background:var(--soft);color:var(--ink-2)}
-.chip[aria-pressed="true"] .cnt{background:color-mix(in srgb,var(--on-accent) 25%,transparent);color:var(--on-accent)}
-.expand{margin-left:auto;font:500 13px var(--f-body);border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:5px 12px;cursor:pointer}
-.expand:hover{border-color:var(--accent)}
-#projects{background:var(--soft)}
-.pcard{border-top:4px solid var(--line);transition:transform .2s,box-shadow .2s}
-.pcard.edu{border-top-color:var(--edu)} .pcard.proj{border-top-color:var(--proj)} .pcard.work{border-top-color:var(--work)}
-.pcard:hover{transform:translateY(-3px);box-shadow:0 14px 30px -20px color-mix(in srgb,var(--ink) 60%,transparent)}
-.pfoot{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;margin-top:4px}
-.seej{font:600 13px var(--f-body);border:0;background:none;color:var(--accent);cursor:pointer;padding:2px 0}
-.seej:hover{text-decoration:underline}
-.cbox{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:28px;display:grid;gap:14px;max-width:760px}
-.cbox .big{font:700 clamp(24px,3.4vw,34px)/1.15 var(--f-display)}
-
+@media (max-width:1000px){.sgrid{grid-template-columns:repeat(3,minmax(0,1fr))}.pgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:1100px){.hero .wrap{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.hero .wrap > div:first-child{grid-column:1/-1}}
 @media (max-width:900px){
   .hero .wrap,.feature{grid-template-columns:minmax(0,1fr)}
-  .pgrid,.tiers{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .tiers{grid-template-columns:minmax(0,1fr)}
   .evidence{grid-template-columns:minmax(0,1fr)}
+  .fgroup{grid-template-columns:minmax(0,1fr);gap:6px}
+  .flabel{padding-top:0}
 }
 @media (max-width:760px){
-  .lanes-head{display:none}
-  .jrow{grid-template-columns:minmax(0,1fr)}
-  .jrow .yr{text-align:left;padding:14px 0 0 0;font-weight:500}
-  .lane.empty{display:none}
-  .lane::before{left:11px}
-  .pgrid,.tiers{grid-template-columns:minmax(0,1fr)}
   .top .wrap{flex-wrap:wrap;row-gap:4px}
   .brand{flex:1}
   .nav{order:3;flex-basis:100%}
   [id]{scroll-margin-top:110px}
-  .cbox{padding:20px}
+  .lanes-head{display:none}
+  .jrow{grid-template-columns:minmax(0,1fr)}
+  .lane.spancell{grid-column:auto}
+  .lane.spancell > .item{width:auto}
+  .kids.split{grid-template-columns:minmax(0,1fr);row-gap:8px}
+  .jrow .yr{text-align:left;padding:14px 0 0}
+  .lane.empty{display:none}
+  .sgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pgrid{grid-template-columns:minmax(0,1fr)}
   section{padding-block:48px}
+  .cbox{padding:20px}
 }
 </style>
-
 </head>
 <body>
+
 <header class="top"><div class="wrap">
   <a class="brand" href="#top">Iván Pérez<span>.</span></a>
   <nav class="nav" id="nav" aria-label="Sections"></nav>
@@ -282,25 +399,21 @@ svg .sb .dot{stroke:var(--surface);stroke-width:2.5}
   <div class="hero"><div class="wrap" id="hero"></div></div>
   <section id="journey"><div class="wrap">
     <div class="head" id="jHead"></div>
-    <div class="filter"><div class="chips" id="skillChips" role="group"></div><div class="evidence" id="evidence"></div></div>
+    <div class="filter" id="filters"></div>
+    <div class="evidence" id="evidence"></div>
     <div class="jtools" id="jTools"></div>
     <div class="legend" id="jLegend"></div>
     <div class="lanes-head" id="lanesHead"></div>
-    <div class="journey" id="journeyRows"></div>
+    <div id="journeyRows"></div>
+  </div></section>
+  <section id="soft"><div class="wrap">
+    <div class="head" id="softHead"></div>
+    <div class="sgrid" id="sgrid"></div>
   </div></section>
   <section id="projects"><div class="wrap">
     <div class="head" id="pHead"></div>
     <div class="feature" id="kafkaFeature"></div>
     <div class="pgrid" id="pgrid"></div>
-  </div></section>
-  <section id="skills"><div class="wrap">
-    <div class="head" id="sHead"></div>
-    <div class="tiers" id="tiers"></div>
-    <p class="langs" id="spoken"></p>
-  </div></section>
-  <section id="contact"><div class="wrap">
-    <div class="head" id="cHead"></div>
-    <div class="contact" id="contactLinks"></div>
   </div></section>
 </main>
 <footer><div class="wrap" id="foot"></div></footer>
@@ -316,243 +429,310 @@ const GH='https://github.com/';
 
 /* ---------------- UI strings ---------------- */
 const S={
- nav:{en:[['journey','Journey'],['projects','Projects'],['skills','Skills'],['contact','Contact']],es:[['journey','Trayectoria'],['projects','Proyectos'],['skills','Habilidades'],['contact','Contacto']]},
+ nav:{en:[['journey','Journey'],['soft','Soft skills'],['projects','Projects']],es:[['journey','Trayectoria'],['soft','Habilidades blandas'],['projects','Proyectos']]},
+ avail:{en:'Open to remote backend roles',es:'Abierto a roles backend remotos'},
+ todayL:{en:'Today',es:'Hoy'},now:{en:'Self-directed upskilling in agentic software development',es:'Upskilling autónomo en desarrollo de software agéntico'},
+ goalL:{en:'Goal',es:'Meta'},goal:{en:'Java backend with applied AI → AI product engineer',es:'Backend Java con IA aplicada → AI product engineer'},
+ nowL:{en:'Now',es:'Ahora'},nowT:{en:'In progress',es:'En curso'},
  hello:{en:'Hi, I’m',es:'Hola, soy'},
  role:{en:'<b>Backend Software Engineer</b> · Java & Spring Boot · microservices · applied AI',es:'<b>Desarrollador backend</b> · Java & Spring Boot · microservicios · IA aplicada'},
- lead:{en:'I’ve been building software since 2015 and Java backends since 2019. Today I’m a Java Developer (Ssr Advanced) at Globant, after two years as a Java Senior Developer at EPAM. I design features end to end in modular monoliths and microservices with DDD and clean architecture, and I deliver with spec-driven development and AI agents.',
-       es:'Construyo software desde 2015 y backends en Java desde 2019. Hoy soy Java Developer (Ssr Advanced) en Globant, después de dos años como Java Senior Developer en EPAM. Diseño funcionalidades de punta a punta en monolitos modulares y microservicios con DDD y arquitectura limpia, y entrego con desarrollo guiado por especificaciones y agentes de IA.'},
- cta1:{en:'See my journey',es:'Ver mi trayectoria'},
- cta2:{en:'GitHub profile',es:'Perfil de GitHub'},
- avail:{en:'Open to remote backend roles',es:'Abierto a roles backend remotos'},
- stripT:{en:'My path at a glance · click any mark',es:'Mi recorrido de un vistazo · haz clic en cualquier marca'},
- expand:{en:'Expand all',es:'Expandir todo'},collapse:{en:'Collapse all',es:'Contraer todo'},
- seeJ:{en:'See in journey',es:'Ver en la trayectoria'},
- cBig:{en:'Looking for a backend developer who understands the business before writing code?',es:'¿Buscas un desarrollador backend que entienda el negocio antes de escribir código?'},
+ lead:{en:'I build backend features end to end in microservices and modular monoliths, with clean architecture, a quality mindset and AI-assisted, spec-driven delivery.',
+       es:'Construyo funcionalidades backend de punta a punta en microservicios y monolitos modulares, con arquitectura limpia, mentalidad de calidad y entrega guiada por especificaciones con IA.'},
+ cta1:{en:'See my journey',es:'Ver mi trayectoria'},cta2:{en:'GitHub profile',es:'Perfil de GitHub'},
  facts:{en:[['10+','years building software'],['7','years in Java & Spring Boot backends']],es:[['10+','años construyendo software'],['7','años en backends Java y Spring Boot']]},
+ stripT:{en:'My path at a glance · click any mark',es:'Mi recorrido de un vistazo · haz clic en cualquier marca'},
  jEyebrow:{en:'Journey',es:'Trayectoria'},
- jTitle:{en:'From a high-school project to professional backend work',es:'De un proyecto de colegio al backend profesional'},
- jText:{en:'Three lanes side by side: what I studied, where I worked and what I built on my own. Pick a skill to see where it shows up, at work and in code. Click any card for the details.',es:'Tres carriles en paralelo: lo que estudié, dónde trabajé y lo que construí por mi cuenta. Elige una habilidad para ver dónde aparece, en el trabajo y en el código. Haz clic en cualquier tarjeta para ver el detalle.'},
+ jTitle:{en:'Every step, with evidence and transparency',es:'Cada paso, con evidencia y transparencia'},
+ jText:{en:'What I studied, where I worked and what I built, side by side. Filter by a technology or a soft skill; click a card for details.',es:'Lo que estudié, dónde trabajé y lo que construí, lado a lado. Filtra por una tecnología o una habilidad blanda; haz clic en una tarjeta para ver el detalle.'},
  lanes:{en:['Education','Work','Own projects'],es:['Formación','Experiencia laboral','Proyectos propios']},
+ fTech:{en:'Technologies',es:'Tecnologías'},fSoft:{en:'Soft skills',es:'Habilidades blandas'},
  all:{en:'All',es:'Todo'},
+ tagTech:{en:'technology',es:'tecnología'},tagSoft:{en:'soft skill',es:'habilidad blanda'},
  evEdu:{en:'In education',es:'En la formación'},evWork:{en:'At work',es:'En el trabajo'},evProj:{en:'In my code',es:'En mi código'},
- evNone:{en:'—',es:'—'},
  gapNext:{en:'No public code yet. Next on my list.',es:'Aún sin código público. Es lo siguiente en mi lista.'},
- pickSkill:{en:'Choose a skill to see its evidence across the three lanes.',es:'Elige una habilidad para ver su evidencia en los tres carriles.'},
+ pickSkill:{en:'Pick a technology or a soft skill to see where it shows up.',es:'Elige una tecnología o una habilidad blanda para ver dónde aparece.'},
+ expand:{en:'Expand all',es:'Expandir todo'},collapse:{en:'Collapse all',es:'Contraer todo'},
  tour:{en:'Walk through the journey',es:'Recorrer la trayectoria'},
  play:{en:'Play',es:'Reproducir'},pause:{en:'Pause',es:'Pausar'},step:{en:'Step',es:'Paso'},reset:{en:'Reset',es:'Reiniciar'},
  stPlaying:{en:'Playing',es:'Reproduciendo'},stPaused:{en:'Paused',es:'En pausa'},stIdle:{en:'Ready',es:'Listo'},stDone:{en:'Done',es:'Terminado'},
- present:{en:'Present',es:'Hoy'},
- did:{en:'What I did',es:'Qué hice'},learned:{en:'What I learned',es:'Qué aprendí'},tech:{en:'Stack',es:'Tecnologías'},rel:{en:'Related',es:'Relacionado'},
+ did:{en:'What I did',es:'Qué hice'},learned:{en:'What I learned',es:'Qué aprendí'},rel:{en:'Related',es:'Relacionado'},
  public:{en:'public',es:'público'},private:{en:'private',es:'privado'},pending:{en:'to upload',es:'por subir'},
+ softEyebrow:{en:'Soft skills',es:'Habilidades blandas'},softTitle:{en:'What I bring beyond the code',es:'Lo que aporto más allá del código'},
+ softText:{en:'Each dot is a place where I practiced it. Click a skill to see those moments in the journey.',es:'Cada punto es un lugar donde la practiqué. Haz clic en una habilidad para ver esos momentos en la trayectoria.'},
+ in:{en:'in',es:'en'},places:{en:'places',es:'lugares'},
  pEyebrow:{en:'Projects',es:'Proyectos'},pTitle:{en:'Code I can show',es:'Código que puedo mostrar'},
- pText:{en:'Work code belongs to clients, so here are the projects I own, plus labs on technologies I’ve used at work and others I’m going deeper into, like Quarkus.',es:'El código laboral pertenece a los clientes, así que aquí están mis proyectos propios y laboratorios con tecnologías que he usado en el trabajo y otras que estoy profundizando, como Quarkus.'},
- sEyebrow:{en:'Skills',es:'Habilidades'},sTitle:{en:'Honest about the level',es:'Con honestidad sobre el nivel'},
+ pText:{en:'Work code belongs to clients, so here are my own projects and labs. I’m polishing them now with AI-assisted best practices.',es:'El código laboral pertenece a los clientes, así que aquí están mis proyectos y laboratorios propios. Ahora los estoy puliendo con buenas prácticas apoyadas en IA.'},
+ seeJ:{en:'See in journey',es:'Ver en la trayectoria'},
+ sEyebrow:{en:'Technologies',es:'Tecnologías'},sTitle:{en:'Honest about the level',es:'Con honestidad sobre el nivel'},
  sText:{en:'Grouped by how deeply I know each one.',es:'Agrupadas según qué tan a fondo conozco cada una.'},
  tiers:{en:[['Strong','Daily work, production experience'],['Comfortable','Used in real projects'],['Going deeper','Taking them further with hands-on labs']],es:[['Domino','Trabajo diario, experiencia en producción'],['Con soltura','Usadas en proyectos reales'],['Profundizando','Llevándolas más a fondo con laboratorios prácticos']]},
- spoken:{en:'Spanish (native) · English (upper intermediate, B2)',es:'Español (nativo) · Inglés (intermedio alto, B2)'},
+ spoken:{en:'English B2 · Spanish native',es:'Inglés B2 · Español nativo'},
  cEyebrow:{en:'Contact',es:'Contacto'},cTitle:{en:'Let’s talk',es:'Conversemos'},
- cText:{en:'Based in Medellín, Colombia. Open to remote backend roles.',es:'Vivo en Medellín, Colombia. Abierto a roles backend remotos.'},
+ cText:{en:'Based in Medellín, Colombia.',es:'Vivo en Medellín, Colombia.'},
+ cBig:{en:'Looking for a backend developer who understands the business before writing code?',es:'¿Buscas un desarrollador backend que entienda el negocio antes de escribir código?'},
  foot:{en:'Built by hand as a static site on GitHub Pages.',es:'Hecho a mano como sitio estático en GitHub Pages.'},
  kInfo0:{en:'Click a box in the diagram to see what it does.',es:'Haz clic en una caja del diagrama para ver qué hace.'}
 };
 
-/* ---------------- skills ---------------- */
-const SK={
+/* ---------------- technologies ---------------- */
+const TK={
  java:{en:'Java & Spring Boot',es:'Java y Spring Boot'},
- kafka:{en:'Kafka & events',es:'Kafka y eventos'},
  micro:{en:'Microservices',es:'Microservicios'},
  arch:{en:'Clean architecture & DDD',es:'Arquitectura limpia y DDD'},
- testing:{en:'Testing & quality',es:'Pruebas y calidad'},
- sql:{en:'SQL & data modeling',es:'SQL y modelado de datos'},
- aws:{en:'AWS',es:'AWS'},
- redis:{en:'Redis & caching',es:'Redis y caché'},
+ sdd:{en:'Spec-Driven Development',es:'Spec-Driven Development'},
  ai:{en:'AI-assisted delivery',es:'Desarrollo con IA'},
+ testing:{en:'Testing & quality gates',es:'Pruebas y quality gates'},
+ sql:{en:'SQL & data modeling',es:'SQL y modelado de datos'},
+ kafka:{en:'Kafka',es:'Kafka'},
+ aws:{en:'AWS',es:'AWS'},
+ redis:{en:'Redis',es:'Redis'},
  python:{en:'Python & automation',es:'Python y automatización'},
- req:{en:'Requirements & clients',es:'Requisitos y clientes'},
  mobile:{en:'Mobile & desktop',es:'Móvil y escritorio'},
- mentor:{en:'Mentoring',es:'Mentoría'},
  legacy:{en:'Legacy modernization',es:'Modernización de legacy'}
+};
+/* ---------------- soft skills ---------------- */
+const IP={
+ discovery:'<circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/>',
+ negotiation:'<path d="M4 8h13l-3-3M20 16H7l3 3"/>',
+ ownership:'<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>',
+ leadership:'<path d="M4 21v-2a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v2"/><circle cx="12" cy="7" r="4"/><path d="m9.5 3.5 2.5-2 2.5 2"/>',
+ mentoring:'<path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c3 2 9 2 12 0v-5"/>',
+ teamwork:'<circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M3 19c1-3 3-4 5-4s4 1 5 4M11 19c1-3 3-4 5-4s4 1 5 4"/>',
+ communication:'<path d="M4 5h16v11H9l-5 4z"/>',
+ learning:'<path d="M4 5c3-1 6-1 8 1 2-2 5-2 8-1v14c-3-1-6-1-8 1-2-2-5-2-8-1z"/><path d="M12 6v14"/>',
+ quality:'<path d="M12 3l8 3v6c0 5-4 8-8 9-4-1-8-4-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/>',
+ adaptability:'<path d="M20 12a8 8 0 0 1-14 5M4 12a8 8 0 0 1 14-5"/><path d="M18 3v4h-4M6 21v-4h4"/>',
+ pressure:'<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/>',
+ punctuality:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="m9 15.5 2 2 4-4"/>',
+ problem:'<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"/>'
+};
+const ico=k=>'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+IP[k]+'</svg>';
+const toolSvg=()=>'<span class="flagw toolw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.2L3 17.8V21h3.2l6.3-6.3a4 4 0 0 0 5.2-5.4l-2.6 2.6-2.4-.5-.5-2.4z"/><path d="M16 16l4 4M14 18l2-2"/></svg></span>';
+const flagSvg=()=>'<span class="flagw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4"/><path class="cloth" d="M5 4h11l-2 4 2 4H5" fill="currentColor" fill-opacity=".25"/></svg></span>';
+const GLOBE='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg>';
+const SS={
+ discovery:{l:{en:'Requirements & discovery',es:'Levantamiento de requisitos'},d:{en:'Understanding the business and the user before writing code.',es:'Entender el negocio y al usuario antes de escribir código.'}},
+ negotiation:{l:{en:'Client negotiation',es:'Negociación con clientes'},d:{en:'Agreeing on scope and priorities with the people who pay.',es:'Acordar alcance y prioridades con quien paga.'}},
+ ownership:{l:{en:'Ownership & delivery',es:'Compromiso y entrega'},d:{en:'Taking features from idea to production, on time.',es:'Llevar funcionalidades de la idea a producción, a tiempo.'}},
+ leadership:{l:{en:'Leadership',es:'Liderazgo'},d:{en:'Leading people and support, not just code.',es:'Liderar personas y soporte, no solo código.'}},
+ mentoring:{l:{en:'Mentoring',es:'Mentoría'},d:{en:'Ramping people up and helping them grow.',es:'Acompañar a otros a arrancar y crecer.'}},
+ teamwork:{l:{en:'Teamwork',es:'Trabajo en equipo'},d:{en:'Working in Scrum teams and pairs, across roles.',es:'Trabajar en equipos Scrum y en parejas, entre roles.'}},
+ communication:{l:{en:'Communication',es:'Comunicación'},d:{en:'Clear specs, contract notes, demos and documentation.',es:'Specs claras, notas de contratos, demos y documentación.'}},
+ quality:{l:{en:'Quality mindset',es:'Mentalidad de calidad'},d:{en:'Testing early and treating quality gates as part of the job.',es:'Probar temprano y ver los quality gates como parte del trabajo.'}},
+ problem:{l:{en:'Problem solving',es:'Resolución de problemas'},d:{en:'Debugging production issues and untangling legacy code.',es:'Depurar incidentes en producción y desenredar código legacy.'}},
+ pressure:{l:{en:'Working under pressure',es:'Trabajo bajo presión'},d:{en:'Delivering with the clock running: contests, client issues and releases.',es:'Entregar con el reloj corriendo: maratones, incidentes de cliente y entregas.'}},
+ adaptability:{l:{en:'Adaptability',es:'Adaptabilidad'},d:{en:'New stacks, new domains and new clients.',es:'Stacks, dominios y clientes nuevos.'}},
+ punctuality:{l:{en:'Punctuality',es:'Puntualidad'},d:{en:'Showing up on time and keeping the dates I commit to.',es:'Llegar a tiempo y cumplir las fechas que me comprometo.'}},
+ learning:{l:{en:'Self-learning',es:'Aprendizaje autónomo'},d:{en:'Self-taught at heart: labs, side projects and courses.',es:'Autodidacta: laboratorios, proyectos propios y cursos.'}}
 };
 
 /* ---------------- journey data ---------------- */
 const IT=[
- {id:'g10',lane:'edu',k:2010,yr:{en:'10th gr.',es:'Grado 10'},when:{en:'High school · 10th grade',es:'Bachillerato · grado 10'},kind:{en:'Project',es:'Proyecto'},
+ {id:'g10',lane:'edu',parent:'tec',k:2012,yr:'2012',when:{en:'2012 · 10th grade',es:'2012 · grado 10'},kind:{en:'Project',es:'Proyecto'},
   title:'Confeccionarte',org:{en:'High school project',es:'Proyecto de bachillerato'},
   sum:{en:'My first complete program with a delivery date: a Java Swing desktop app for a garment business.',es:'Mi primer programa completo con fecha de entrega: una app de escritorio en Java Swing para un negocio de confección.'},
-  did:{en:['Built screens for clients, employees and login with Java Swing.'],es:['Construí las pantallas de clientes, empleados e inicio de sesión con Java Swing.']},
   learned:{en:'Taking a project from idea to delivery, on time.',es:'Llevar un proyecto de la idea a la entrega, a tiempo.'},
-  stack:['Java','Swing','Maven'],skills:['java','mobile'],repo:{n:'ipereto/confeccionarte',s:'private'}},
- {id:'g11',lane:'edu',k:2011,yr:{en:'11th gr.',es:'Grado 11'},when:{en:'High school · 11th grade',es:'Bachillerato · grado 11'},kind:{en:'Project',es:'Proyecto'},
-  title:'Deymon Jeans',org:{en:'High school capstone with a real client',es:'Proyecto de grado con un cliente real'},
+  stack:['Java','Swing'],tech:['java','mobile'],soft:['ownership','learning'],repo:{n:'ipereto/confeccionarte',s:'private'}},
+ {id:'maraton',lane:'edu',parent:'tec',k:2012.2,yr:'2012',when:{en:'2012 – 2013 · 10th–11th grade',es:'2012 – 2013 · grados 10 y 11'},kind:{en:'Competitions',es:'Competencias'},
+  title:{en:'Programming marathons',es:'Maratones de programación'},org:{en:'Code challenges, in teams and individually',es:'Code challenges en equipo e individuales'},
+  sum:{en:'Competed in programming marathons, solving algorithmic challenges in Java both in teams and on my own.',es:'Participé en maratones de programación resolviendo retos algorítmicos en Java, tanto en equipo como de forma individual.'},
+  learned:{en:'Solving problems against the clock and splitting the work within a team.',es:'Resolver problemas contra el reloj y repartir el trabajo dentro de un equipo.'},
+  stack:['Java','Algorithms'],tech:['java'],soft:['problem','teamwork','pressure','learning']},
+ {id:'g11',lane:'edu',parent:'tec',k:2013,yr:'2013',when:{en:'2013 · 11th grade',es:'2013 · grado 11'},kind:{en:'Project',es:'Proyecto'},
+  title:'Deymon Jeans',org:{en:'Capstone with a real client',es:'Proyecto de grado con un cliente real'},
   sum:{en:'I found a real client, a jeans manufacturer, studied how it operated and solved its problem with software.',es:'Busqué un cliente real, una fábrica de jeans, estudié cómo operaba y resolví su problema con software.'},
-  did:{en:['Mapped the client’s operating process before writing code.','Built two modules: a transactional CRUD and a domain module.','Delivered on the school’s timeline. Versioned with Subversion back then.'],es:['Levanté el proceso operativo del cliente antes de escribir código.','Construí dos módulos: un CRUD transaccional y uno de dominio.','Entregué en los tiempos del colegio. En esa época versionaba con Subversion.']},
+  did:{en:['Mapped the client’s operating process before writing code.','Built a transactional CRUD and a domain module.'],es:['Levanté el proceso operativo del cliente antes de escribir código.','Construí un CRUD transaccional y un módulo de dominio.']},
   learned:{en:'Understand the business first; the code comes second.',es:'Primero entender el negocio; el código viene después.'},
-  stack:[],skills:['req','sql'],repo:{n:'',s:'pending'}},
- {id:'tec',lane:'edu',k:2012,end:2015,yr:'2012',when:'2012 – 2015',kind:{en:'Degree',es:'Título'},
+  stack:['SQL'],tech:['sql'],soft:['discovery','ownership','communication'],repo:{n:'',s:'pending'}},
+ {id:'tec',lane:'edu',k:2012.4,end:2015,yr:'2012',when:'2012 – 2015',kind:{en:'Degree',es:'Título'},
   title:{en:'Professional Technician in Information Systems Programming',es:'Técnico profesional en programación de sistemas de información'},
-  org:{en:'Politécnico Colombiano Jaime Isaza Cadavid · with honors',es:'Politécnico Colombiano Jaime Isaza Cadavid · con honores'},
-  sum:{en:'Programming fundamentals, databases and software development.',es:'Fundamentos de programación, bases de datos y desarrollo de software.'},skills:['java','sql']},
- {id:'cert13',lane:'edu',k:2013.5,yr:'2013',when:'2013',kind:{en:'Certificates',es:'Certificados'},
-  title:{en:'HTML5, JavaScript & CSS3 · Microsoft Virtual Academy',es:'HTML5, JavaScript y CSS3 · Microsoft Virtual Academy'},
+  org:{en:'Politécnico Jaime Isaza Cadavid · technical program with my high school',es:'Politécnico Jaime Isaza Cadavid · media técnica articulada con el colegio'},
+  sum:{en:'A technical program articulated between my high school and the Politécnico: I started programming in 10th grade and finished the degree in 2015.',es:'Media técnica articulada entre el colegio y el Politécnico: empecé a programar en grado 10 y terminé el título en 2015.'},stack:[],tech:[],soft:['learning']},
+ {id:'cert13',lane:'edu',parent:'tec',k:2013.5,yr:'2013',when:'2013',kind:{en:'Certificates',es:'Certificados'},
+  title:{en:'HTML5, JavaScript & CSS3 · MVA',es:'HTML5, JavaScript y CSS3 · MVA'},
   org:{en:'Intelligent Training · Alianza Futuro Digital',es:'Intelligent Training · Alianza Futuro Digital'},
-  sum:{en:'Web fundamentals and an acceleration course with Microsoft Virtual Academy.',es:'Fundamentos web y un curso de aceleración con Microsoft Virtual Academy.'},skills:[]},
- {id:'emtelco',lane:'work',k:2015.0,end:2015.5,yr:'2015',when:{en:'Jan – Jul 2015',es:'ene – jul 2015'},kind:{en:'Job',es:'Empleo'},
-  title:'QA Tester',org:{en:'Emtelco · BPO & contact center',es:'Emtelco · BPO y contact center'},
-  sum:{en:'Designed test plans for IVR, CRM and reporting applications.',es:'Diseñé planes de prueba para aplicaciones de IVR, CRM y reportes.'},
-  did:{en:['Turned requirements and IVR workflows into test plans and test cases.','Managed bugs in Mantis and wrote closing reports and user manuals.'],es:['Convertí requisitos y flujos de IVR en planes y casos de prueba.','Gestioné bugs en Mantis y escribí informes de cierre y manuales de usuario.']},
-  learned:{en:'Thinking about how software fails, before it reaches users.',es:'Pensar en cómo falla el software antes de que llegue a los usuarios.'},
-  stack:['Mantis','Enterprise Architect'],skills:['testing','req']},
- {id:'cun',lane:'edu',k:2015.45,yr:'2015',when:{en:'Jun – Dec 2015',es:'jun – dic 2015'},kind:{en:'Certificate',es:'Certificado'},
+  sum:{en:'Web fundamentals and a Microsoft Virtual Academy acceleration course.',es:'Fundamentos web y un curso de aceleración de Microsoft Virtual Academy.'},stack:['HTML5','JavaScript','CSS3'],tech:[],soft:['learning']},
+ {id:'emtelco',lane:'work',parent:'tecno',k:2015.0,end:2015.5,yr:'2015',when:{en:'Jan – Jul 2015',es:'ene – jul 2015'},kind:{en:'Job',es:'Empleo'},
+  title:{en:'QA Analyst',es:'Analista de QA'},org:{en:'Emtelco · contact center',es:'Emtelco · contact center'},
+  sum:{en:'I designed the test strategy and plans for a contact center’s IVR, CRM and reporting applications, from requirements analysis to the closing report.',es:'Diseñé la estrategia y los planes de prueba para aplicaciones de IVR, CRM y reportes de un contact center, desde el análisis de requisitos hasta el informe de cierre.'},
+  did:{en:['Analyzed requirements and IVR workflows in Enterprise Architect to design test plans and cases.','Defined each plan’s scope, risks, prerequisites and strategy.','Applied white-box and black-box testing; managed bugs in Mantis.','Wrote closing reports and user manuals.'],es:['Analicé requisitos y flujos de IVR en Enterprise Architect para diseñar planes y casos de prueba.','Definí alcance, riesgos, prerrequisitos y estrategia de cada plan.','Apliqué pruebas de caja blanca y caja negra; gestioné los bugs en Mantis.','Escribí informes de cierre y manuales de usuario.']},
+  learned:{en:'Quality is designed from the requirements, not added at the end.',es:'La calidad se diseña desde los requisitos, no al final.'},
+  stack:['QC','White-box testing','Black-box testing','Test plans','Documentation','Mantis'],tech:['testing'],soft:['quality','punctuality','teamwork','ownership','communication']},
+ {id:'cun',lane:'edu',parent:'tecno',k:2015.45,yr:'2015',when:{en:'Jun – Dec 2015',es:'jun – dic 2015'},kind:{en:'Certificate',es:'Certificado'},
   title:{en:'Management of Local Information Systems',es:'Gestión de sistemas de información locales'},
-  org:{en:'CUN & COLNODO, supported by Google',es:'CUN y COLNODO, con apoyo de Google'},sum:'',skills:[]},
- {id:'simac',lane:'work',k:2015.7,end:2019.7,yr:'2015',when:{en:'Sep 2015 – Sep 2019',es:'sep 2015 – sep 2019'},kind:{en:'Job',es:'Empleo'},
-  title:{en:'Software Developer',es:'Desarrollador de software'},org:{en:'SIMAC S.A.S. · industrial sector',es:'SIMAC S.A.S. · sector industrial'},
-  sum:{en:'Automated industrial processes and integrated data; made technical decisions for the team.',es:'Automaticé procesos industriales e integré datos; tomé decisiones técnicas para el equipo.'},
-  did:{en:['Automated processes with Python, Java, VBScript, SQL and RPA, integrating structured and unstructured data (emails, documents, spreadsheets).','Built SQL Server reports and stored procedures with Reporting Services.','Ran application servers on AWS EC2.','Created new services for industrial clients and grew the company’s knowledge base.'],es:['Automaticé procesos con Python, Java, VBScript, SQL y RPA, integrando datos estructurados y no estructurados (correos, documentos, hojas de cálculo).','Construí reportes y procedimientos almacenados en SQL Server con Reporting Services.','Administré servidores de aplicaciones en AWS EC2.','Creé nuevos servicios para clientes industriales y amplié la base de conocimiento de la empresa.']},
-  stack:['Python','Java','SQL Server','RPA','AWS EC2'],skills:['python','sql','aws','req','mentor'],rel:['granja']},
+  org:{en:'CUN & COLNODO, supported by Google',es:'CUN y COLNODO, con apoyo de Google'},stack:[],tech:[],soft:['learning']},
+ {id:'simac',lane:'work',parent:'tecno',k:2015.7,end:2019.7,yr:'2015',when:{en:'Sep 2015 – Sep 2019',es:'sep 2015 – sep 2019'},kind:{en:'Job',es:'Empleo'},
+  title:{en:'Software Developer & IT Lead',es:'Desarrollador de software y líder de TI'},org:{en:'SIMAC S.A.S. · industrial sector',es:'SIMAC S.A.S. · sector industrial'},
+  sum:{en:'Automated industrial processes and integrated data, made technical decisions for the team and, at the same time, led IT and the help desk.',es:'Automaticé procesos industriales e integré datos, tomé decisiones técnicas para el equipo y, en paralelo, lideré TI y el help desk.'},
+  did:{en:['Automation with Python, Java, VBScript, SQL and RPA, across structured and unstructured data.','SQL Server reports and stored procedures.','Application servers on AWS EC2.','New services for industrial clients; grew the team’s knowledge base.','IT lead and assistant: led the help desk and supported the company’s technology.'],es:['Automatización con Python, Java, VBScript, SQL y RPA, con datos estructurados y no estructurados.','Reportes y procedimientos almacenados en SQL Server.','Servidores de aplicaciones en AWS EC2.','Nuevos servicios para clientes industriales; amplié la base de conocimiento del equipo.','Líder y asistente de TI: lideré el help desk y di soporte a la tecnología de la empresa.']},
+  stack:['Java','Python','SQL','SQL Server','Reporting Services','Scripting','RPA','AWS EC2'],tech:['java','python','sql','aws'],soft:['leadership','problem','discovery','ownership','communication'],rel:['granja']},
  {id:'tecno',lane:'edu',k:2015.55,end:2017,yr:'2015',when:'2015 – 2017',kind:{en:'Degree',es:'Título'},
   title:{en:'Technology in Data Systematization',es:'Tecnología en sistematización de datos'},
-  org:{en:'Politécnico Colombiano Jaime Isaza Cadavid · with honors',es:'Politécnico Colombiano Jaime Isaza Cadavid · con honores'},
-  sum:{en:'Software engineering, data and project work with real clients.',es:'Ingeniería de software, datos y proyectos con clientes reales.'},skills:['sql','req'],rel:['granja']},
- {id:'granja',lane:'edu',k:2016.5,yr:'2016',when:'2016',kind:{en:'Project',es:'Proyecto'},
-  title:'SistemaGranja',org:{en:'Academic project · dairy farm in Marinilla, Antioquia',es:'Proyecto académico · finca lechera en Marinilla, Antioquia'},
-  sum:{en:'A dairy farm management system built for a real client. We went to the farm to learn its milk production process.',es:'Un sistema de gestión de finca lechera para un cliente real. Fuimos a la finca a conocer su proceso de producción de leche.'},
-  did:{en:['Gathered requirements on site: how cattle milk production works day to day.','Defined the scope and negotiated it with the client.','Modeled herd, breeds, reproduction, palpation, health, mastitis control and milk production and delivery.'],es:['Levanté requisitos en la finca: cómo funciona día a día la producción de leche con bovinos.','Definí el alcance y lo negocié con el cliente.','Modelé hato, razas, reproducción, palpación, sanidad, control de mastitis y producción y entrega de leche.']},
-  learned:{en:'Field requirements gathering, scope limits and negotiating with a client.',es:'Levantar requisitos en campo, limitar el alcance y negociar con un cliente.'},
-  stack:['Python 2','Django 1.9','SQLite'],skills:['python','req','sql'],repo:{n:'ipereto/SistemaGranja',s:'public'},rel:['tecno']},
- {id:'youglish',lane:'proj',k:2019.2,yr:'2019',when:'2019',kind:{en:'Side project',es:'Proyecto personal'},
-  title:'YouGlishApp',org:{en:'Mobile app with Flutter',es:'App móvil con Flutter'},
-  sum:{en:'A Flutter app that uses the YouGlish API to practice English pronunciation with real videos.',es:'Una app en Flutter que usa la API de YouGlish para practicar la pronunciación en inglés con videos reales.'},
-  learned:{en:'Picking up a new stack on my own.',es:'Aprender un stack nuevo por mi cuenta.'},
-  stack:['Flutter','Dart','REST API'],skills:['mobile'],repo:{n:'ipereto/youglishapp',s:'private'}},
+  org:{en:'Politécnico Jaime Isaza Cadavid',es:'Politécnico Jaime Isaza Cadavid'},
+  sum:{en:'Software development, data, projects with real clients and my immersion in the job market.',es:'Desarrollo de software, datos, proyectos con clientes reales e inmersión en el mercado laboral.'},stack:['SQL','Networking'],tech:['sql'],soft:['learning','teamwork']},
+ {id:'granja',lane:'edu',parent:'tecno',k:2016.5,yr:'2016',when:'2016',kind:{en:'Project',es:'Proyecto'},
+  title:'SistemaGranja',org:{en:'Dairy farm in Marinilla, Antioquia',es:'Finca lechera en Marinilla, Antioquia'},
+  sum:{en:'A dairy farm management system for a real client. We went to the farm to learn its milk production process.',es:'Un sistema de gestión de finca lechera para un cliente real. Fuimos a la finca a conocer su proceso de producción de leche.'},
+  did:{en:['Gathered requirements on site: how cattle milk production works day to day.','Defined the scope and negotiated it with the client.','Modeled herd, reproduction, palpation, health, mastitis control and milk production.'],es:['Levanté requisitos en la finca: cómo funciona día a día la producción de leche con bovinos.','Definí el alcance y lo negocié con el cliente.','Modelé hato, reproducción, palpación, sanidad, control de mastitis y producción de leche.']},
+  learned:{en:'Field requirements, scope limits and negotiation.',es:'Requisitos en campo, límites de alcance y negociación.'},
+  stack:['Python','Django','SQL','PostgreSQL'],tech:['python','sql'],soft:['discovery','negotiation','teamwork'],repo:{n:'ipereto/SistemaGranja',s:'public'}},
+ {id:'maraton2',lane:'edu',parent:'tecno',k:2016.2,yr:'2016',when:{en:'2015 – 2017 · Technology degree',es:'2015 – 2017 · durante la tecnología'},kind:{en:'Competitions',es:'Competencias'},
+  title:{en:'Programming marathons',es:'Maratones de programación'},org:{en:'Code challenges, in teams and individually',es:'Code challenges en equipo e individuales'},
+  sum:{en:'Competed in programming marathons, solving algorithmic challenges in Java both in teams and on my own.',es:'Participé en maratones de programación resolviendo retos algorítmicos en Java, tanto en equipo como de forma individual.'},
+  learned:{en:'Solving problems against the clock and splitting the work within a team.',es:'Resolver problemas contra el reloj y repartir el trabajo dentro de un equipo.'},
+  stack:['Java','Algorithms'],tech:['java'],soft:['problem','teamwork','pressure','learning']},
  {id:'globant1',lane:'work',k:2019.7,end:2021.45,yr:'2019',when:{en:'Sep 2019 – Jun 2021',es:'sep 2019 – jun 2021'},kind:{en:'Job',es:'Empleo'},
-  title:{en:'Java Developer (Jr Adv → Ssr → Ssr Adv)',es:'Java Developer (Jr Adv → Ssr → Ssr Adv)'},org:{en:'Globant · StarMeUp Core',es:'Globant · StarMeUp Core'},
-  sum:{en:'Built and supported Spring Boot microservices; promoted twice in under two years.',es:'Construí y di soporte a microservicios en Spring Boot; dos ascensos en menos de dos años.'},
-  did:{en:['Shipped features across relational and graph databases, AWS Kinesis streams and Redis cache.','Resolved level-3 client issues in legacy services.','Paid down technical debt with refactoring, code review and test coverage.'],es:['Entregué funcionalidades sobre bases de datos relacionales y de grafos, streams de AWS Kinesis y caché en Redis.','Resolví incidentes de cliente de nivel 3 en servicios legacy.','Reduje deuda técnica con refactorización, revisión de código y cobertura de pruebas.']},
-  stack:['Spring Boot','MySQL','Graph DB','AWS Kinesis','Redis'],skills:['java','micro','aws','redis','testing'],rel:['micro']},
- {id:'micro',lane:'proj',k:2020.3,yr:'2020',when:'2020',kind:{en:'Pair project',es:'Proyecto en pareja'},
-  title:'Accounts + API Gateway',org:{en:'Microservices, built with Anderson Mejía',es:'Microservicios, hecho con Anderson Mejía'},
-  sum:{en:'Two Spring Boot services: an API gateway in front of an accounts service for users, groups and skills.',es:'Dos servicios en Spring Boot: un API gateway delante de un servicio de cuentas para usuarios, grupos y habilidades.'},
-  did:{en:['I built the API gateway: routing, MySQL persistence and local setup.','Accounts was organized by component with ports and adapters (gateway, web, service, model).'],es:['Construí el API gateway: enrutamiento, persistencia en MySQL y configuración local.','Accounts se organizó por componente con puertos y adaptadores (gateway, web, service, model).']},
-  learned:{en:'Splitting responsibilities across services and organizing code around the domain.',es:'Repartir responsabilidades entre servicios y organizar el código alrededor del dominio.'},
-  stack:['Java 11','Spring Boot','MySQL','Maven'],skills:['java','micro','arch'],repo:{n:'andermev/api-gateway',s:'private'}},
+  title:{en:'Java Backend Developer · advanced junior → advanced mid-level',es:'Java Backend Developer · junior avanzado → semi-senior avanzado'},org:{en:'Globant · StarMeUp Core',es:'Globant · StarMeUp Core'},
+  sum:{en:'Spring Boot microservices; promoted twice in under two years.',es:'Microservicios en Spring Boot; dos ascensos en menos de dos años.'},
+  did:{en:['Features across relational and graph databases, AWS Kinesis and Redis.','Level-3 client issues in legacy services.','Paid down technical debt: refactoring, code review, test coverage.'],es:['Funcionalidades sobre bases relacionales y de grafos, AWS Kinesis y Redis.','Incidentes de cliente de nivel 3 en servicios legacy.','Reducción de deuda técnica: refactorización, revisión de código, cobertura de pruebas.']},
+  stack:['Spring Boot','MySQL','Kinesis','Redis'],tech:['java','micro','aws','redis','testing'],soft:['problem','teamwork','quality','pressure']},
  {id:'epam',lane:'work',k:2021.45,end:2023.6,yr:'2021',when:{en:'Jun 2021 – Aug 2023',es:'jun 2021 – ago 2023'},kind:{en:'Job',es:'Empleo'},
-  title:{en:'Java Senior Developer',es:'Java Senior Developer'},org:{en:'EPAM Systems · financial project',es:'EPAM Systems · proyecto financiero'},
+  title:'Java Backend Developer · Senior',org:{en:'EPAM Systems · financial project',es:'EPAM Systems · proyecto financiero'},
   sum:{en:'Microservices for a financial client with Java, Kotlin, Spring Boot and SQL, in a 10+ person Scrum team. My first hands-on contact with Kafka.',es:'Microservicios para un cliente financiero con Java, Kotlin, Spring Boot y SQL, en un equipo Scrum de más de 10 personas. Mi primer contacto práctico con Kafka.'},
-  did:{en:['Supported dockerized Java and Kotlin microservices with Spring Boot and SQL in an event-driven architecture, where I first worked with Kafka.','Monitored latency spikes and fixed bugs with Datadog and Kibana.','Covered QA when the team had none: dev testing and QA notes.','Reviewed code and ramped up new team members.'],es:['Di soporte a microservicios dockerizados en Java y Kotlin con Spring Boot y SQL, en una arquitectura de eventos donde tuve mi primer acercamiento a Kafka.','Monitoreé picos de latencia y corregí bugs con Datadog y Kibana.','Cubrí QA cuando el equipo no tenía: pruebas de desarrollo y notas de QA.','Revisé código y acompañé la llegada de nuevos integrantes.']},
-  stack:['Java','Kotlin','Spring Boot','SQL','Kafka','Docker','Datadog','Kibana','GitLab'],skills:['java','kafka','micro','sql','testing','mentor'],rel:['kafka']},
- {id:'fps',lane:'work',k:2024.45,end:2024.6,yr:'2024',when:{en:'Jun – Aug 2024',es:'jun – ago 2024'},kind:{en:'Job',es:'Empleo'},
-  title:{en:'Java Backend Developer',es:'Java Backend Developer'},org:{en:'Globant · insurance company (Argentina)',es:'Globant · aseguradora (Argentina)'},
-  sum:{en:'Migrated a core insurance system from Oracle Forms to Spring Boot microservices.',es:'Migré un sistema central de seguros de Oracle Forms a microservicios en Spring Boot.'},
-  did:{en:['Analyzed each legacy screen from functional documents and discovery recordings to extract business rules and size its complexity.','Designed the Oracle SQL to reproduce each form and built the backend service.','Delivered through code review, DEV → TEST → PRD environments, client demos and UAT.'],es:['Analicé cada pantalla legacy desde documentos funcionales y grabaciones de descubrimiento para extraer reglas de negocio y estimar su complejidad.','Diseñé el SQL en Oracle que reproducía cada formulario y construí el servicio backend.','Entregué con revisión de código, ambientes DEV → TEST → PRD, demos al cliente y UAT.']},
-  stack:['Java','Spring Boot','Oracle Database','GitLab'],skills:['java','micro','sql','legacy','req']},
- {id:'betterme',lane:'work',k:2024.6,end:null,yr:'2024',when:{en:'Aug 2024 – present',es:'ago 2024 – hoy'},kind:{en:'Job',es:'Empleo'},
-  title:{en:'Java Developer Ssr Advanced / Technical Developer',es:'Java Developer Ssr Advanced / Technical Developer'},org:{en:'Globant · performance-management suite for a large e-commerce company',es:'Globant · suite de gestión del desempeño para un gran e-commerce'},
-  sum:{en:'End-to-end features in a modular monolith plus microservices, with DDD, clean architecture and spec-driven development.',es:'Funcionalidades de punta a punta en un monolito modular con microservicios, con DDD, arquitectura limpia y desarrollo guiado por especificaciones.'},
-  did:{en:['Designed and built goals, 360 feedback, performance review and talent review (succession, calibration, rules-engine alerts) across 7+ repositories.','Implemented role and permission enforcement across services and hardened sensitive endpoints.','Modeled data with JPA, wrote Flyway migrations and designed Redis caching.','Delivered with spec-driven development in Kiro: requirements, design and task specs, contract notes and QA logs.','Verified every change against a strict quality gate (tests, coverage, Checkstyle).'],es:['Diseñé y construí objetivos, feedback 360, evaluación de desempeño y revisión de talento (sucesión, calibración, alertas con motor de reglas) en más de 7 repositorios.','Implementé el control de roles y permisos entre servicios y reforcé endpoints sensibles.','Modelé datos con JPA, escribí migraciones con Flyway y diseñé caché con Redis.','Entregué con desarrollo guiado por especificaciones en Kiro: specs de requisitos, diseño y tareas, notas de contratos y registros de QA.','Verifiqué cada cambio contra un quality gate estricto (pruebas, cobertura, Checkstyle).']},
-  stack:['Java 21','Spring Boot','MySQL','JPA','Flyway','Redis','AWS','Kiro'],skills:['java','micro','arch','testing','sql','redis','ai','aws'],rel:['buildear','kafka','golia']},
- {id:'buildear',lane:'proj',k:2026.1,yr:'2026',when:'2026',kind:{en:'Side project',es:'Proyecto personal'},
-  title:'buildEAR',org:{en:'Business platform built with spec-driven development',es:'Plataforma de negocio hecha con desarrollo guiado por especificaciones'},
-  sum:{en:'A single source of truth for an Amway business, run from a Telegram bot over a versioned REST API, designed to cost about $0 a month.',es:'Una fuente única de verdad para un negocio Amway, operada desde un bot de Telegram sobre una API REST versionada, diseñada para costar cerca de $0 al mes.'},
-  did:{en:['Shared inventory with kardex, CRM with a repurchase engine and a prospect pipeline.','REST API (/v1) designed to serve the bot today and a mobile app later.','Specs and steering in Kiro; CI with GitHub Actions.'],es:['Inventario compartido con kardex, CRM con motor de recompra y embudo de prospectos.','API REST (/v1) pensada para servir al bot hoy y a una app móvil después.','Specs y steering en Kiro; CI con GitHub Actions.']},
-  stack:['TypeScript','Express','Prisma','PostgreSQL','Telegraf','Kiro','GitHub Actions'],skills:['ai','sql','arch'],repo:{n:'ipereto/buildEAR',s:'private'}},
- {id:'rtfm',lane:'proj',k:2026.2,yr:'2026',when:'2026',kind:{en:'Side project',es:'Proyecto personal'},
+  did:{en:['Dockerized Java and Kotlin services in an event-driven architecture.','Latency spikes and bugs tracked with Datadog and Kibana.','Covered QA when the team had none.','Code review and onboarding of new members.'],es:['Servicios dockerizados en Java y Kotlin en una arquitectura de eventos.','Picos de latencia y bugs rastreados con Datadog y Kibana.','Cubrí QA cuando el equipo no tenía.','Revisión de código y acompañamiento a nuevos integrantes.']},
+  stack:['Java','Kotlin','Spring Boot','SQL','Kafka','Datadog'],tech:['java','micro','sql','kafka','testing'],soft:['teamwork','mentoring','quality','adaptability'],rel:['kafka']},
+ {id:'globant2',lane:'work',k:2024.44,end:null,yr:'2024',when:{en:'Jun 2024 – present',es:'jun 2024 – hoy'},kind:{en:'Job',es:'Empleo'},
+  title:{en:'Java Backend Developer · advanced mid-level',es:'Java Backend Developer · semi-senior avanzado'},org:{en:'Globant',es:'Globant'},
+  sum:{en:'Back at Globant: backend for different clients through internal projects within the same job.',es:'De vuelta en Globant: backend para distintos clientes a través de proyectos internos dentro del mismo empleo.'},
+  stack:[],tech:[],soft:[]},
+ {id:'fps',lane:'work',parent:'globant2',k:2024.45,end:2024.6,yr:'2024',when:{en:'Jun – Aug 2024',es:'jun – ago 2024'},kind:null,
+  title:{en:'Insurance company (Argentina)',es:'Aseguradora (Argentina)'},org:{en:'Oracle Forms → Spring Boot microservices',es:'Oracle Forms → microservicios en Spring Boot'},
+  sum:{en:'Took part in migrating a core insurance system from Oracle Forms to Spring Boot microservices.',es:'Participé en la migración de un sistema central de seguros de Oracle Forms a microservicios en Spring Boot.'},
+  did:{en:['Analyzed legacy screens from functional documents and discovery sessions to extract business rules.','Designed Oracle SQL and built backend services for my assigned forms.','Worked through code review, DEV → TEST → PRD, client demos and UAT.'],es:['Analicé pantallas legacy desde documentos funcionales y sesiones de descubrimiento para extraer reglas de negocio.','Diseñé el SQL en Oracle y construí los servicios backend de los formularios asignados.','Trabajé con revisión de código, DEV → TEST → PRD, demos al cliente y UAT.']},
+  stack:['Java','Spring Boot','Oracle'],tech:['java','micro','sql','legacy'],soft:['discovery','communication','teamwork','adaptability']},
+ {id:'betterme',lane:'work',parent:'globant2',k:2024.6,end:null,yr:'2024',when:{en:'Aug 2024 – present',es:'ago 2024 – hoy'},kind:null,
+  title:{en:'Performance-management suite',es:'Suite de gestión del desempeño'},org:{en:'Modular monolith + microservices',es:'Monolito modular + microservicios'},
+  sum:{en:'End-to-end features in a modular monolith plus microservices, with DDD and clean architecture, delivered with Spec-Driven Development in Kiro.',es:'Funcionalidades de punta a punta en un monolito modular con microservicios, con DDD y arquitectura limpia, entregadas con Spec-Driven Development en Kiro.'},
+  did:{en:['Goals, 360 feedback, performance and talent review across 7+ repositories.','Role and permission enforcement across services.','JPA modeling, Flyway migrations and Redis caching.','Spec-Driven Development with Kiro: requirements, design and task specs, contract notes and QA logs.','Strict quality gate on every change (tests, coverage, Checkstyle).'],es:['Objetivos, feedback 360, evaluación de desempeño y revisión de talento en más de 7 repositorios.','Control de roles y permisos entre servicios.','Modelado con JPA, migraciones con Flyway y caché con Redis.','Spec-Driven Development con Kiro: specs de requisitos, diseño y tareas, notas de contratos y registros de QA.','Quality gate estricto en cada cambio (pruebas, cobertura, Checkstyle).']},
+  stack:['Java 21','Spring Boot','JPA','Flyway','Redis','Kiro'],tech:['java','micro','arch','sdd','ai','testing','sql','redis'],soft:['ownership','communication','quality','problem'],rel:['buildear','golia']},
+ {id:'buildear',lane:'proj',parent:'now',k:2026.1,yr:'2026',when:'2026',kind:{en:'Side project',es:'Proyecto personal'},
+  title:'buildEAR',org:{en:'Business platform, spec-driven',es:'Plataforma de negocio, guiada por specs'},
+  sum:{en:'A single source of truth for an Amway business, run from a Telegram bot over a versioned REST API, at about $0 a month.',es:'Una fuente única de verdad para un negocio Amway, operada desde un bot de Telegram sobre una API REST versionada, por cerca de $0 al mes.'},
+  did:{en:['Shared inventory with kardex, CRM with a repurchase engine, prospect pipeline.','Specs and steering in Kiro; CI with GitHub Actions.'],es:['Inventario compartido con kardex, CRM con motor de recompra, embudo de prospectos.','Specs y steering en Kiro; CI con GitHub Actions.']},
+  stack:['TypeScript','Express','Prisma','PostgreSQL','Telegraf'],tech:['sdd','ai','sql','arch'],soft:['ownership','discovery'],repo:{n:'ipereto/buildEAR',s:'private'}},
+ {id:'rtfm',lane:'proj',parent:'now',k:2026.2,yr:'2026',when:'2026',kind:{en:'Side project',es:'Proyecto personal'},
   title:'RTFM',org:{en:'Cross-platform app with React Native',es:'App multiplataforma con React Native'},
-  sum:{en:'A study app for doctrine and Bible lookup: categorized library, global search by text and hashtags, reading settings.',es:'Una app de estudio doctrinal y consulta bíblica: biblioteca por categorías, búsqueda global por texto y hashtags, ajustes de lectura.'},
-  stack:['React Native','Expo','TypeScript','Zustand','SQLite'],skills:['mobile'],repo:{n:'ipereto/rtfm',s:'private'}},
- {id:'golia',lane:'proj',k:2026.4,yr:'2026',when:'2026',kind:{en:'Mentoring',es:'Mentoría'},
-  title:'GolIA',org:{en:'Mentor on Diego Builes’ SENA capstone',es:'Mentor del proyecto SENA de Diego Builes'},
-  sum:{en:'I mentored the architecture of a football predictions app: Android with Clean Architecture + MVVM and a Spring Boot + MySQL backend.',es:'Fui mentor de la arquitectura de una app de pronósticos de fútbol: Android con Clean Architecture + MVVM y backend en Spring Boot + MySQL.'},
-  did:{en:['Guided the refactor to Clean Architecture: dependencies point to the domain; Hilt wires it together.','Supported requirements (IEEE-830), use cases and UML design.'],es:['Guié el refactor a Clean Architecture: las dependencias apuntan al dominio y Hilt las conecta.','Acompañé los requisitos (IEEE-830), los casos de uso y el diseño UML.']},
-  stack:['Android','Hilt','Retrofit','Room','Spring Boot','MySQL'],skills:['mentor','arch','mobile','java'],repo:{n:'diyebure89/GolIA',s:'public'}},
- {id:'kafka',lane:'proj',k:2026.8,yr:'2026',when:'2026',kind:{en:'Lab',es:'Laboratorio'},
-  title:'Kafka Lab',org:{en:'Debugger-guided Kafka, from send() to Streams',es:'Kafka guiado con el depurador, de send() a Streams'},
+  sum:{en:'A study app for doctrine and Bible lookup: library, global search by text and hashtags, reading settings.',es:'Una app de estudio doctrinal y consulta bíblica: biblioteca, búsqueda global por texto y hashtags, ajustes de lectura.'},
+  stack:['React Native','Expo','TypeScript','SQLite'],tech:['mobile'],soft:['learning','ownership'],repo:{n:'ipereto/rtfm',s:'private'}},
+ {id:'golia',lane:'proj',parent:'now',k:2026.4,yr:'2026',when:'2026',kind:{en:'Mentoring',es:'Mentoría'},
+  title:'GolIA',org:{en:'Mentoring the repository owner',es:'Mentoría al dueño del repositorio'},
+  sum:{en:'I mentored the repository owner through an upskilling plan to graduate, and taught him to build with AI using Kiro and Spec-Driven Development.',es:'Fui mentor del dueño del repositorio en un plan de upskilling para graduarse y le enseñé a construir con IA usando Kiro y Spec-Driven Development.'},
+  did:{en:['Taught AI-assisted delivery with Kiro: requirements, design and task specs before code.','Guided Clean Architecture + MVVM on Android and a Spring Boot + MySQL backend.'],es:['Le enseñé a entregar con IA en Kiro: specs de requisitos, diseño y tareas antes del código.','Guié Clean Architecture + MVVM en Android y un backend en Spring Boot + MySQL.']},
+  stack:['Kiro','Android','Spring Boot','MySQL'],tech:['sdd','ai','arch','java'],soft:['mentoring','communication'],repo:{n:'diyebure89/GolIA',s:'public'}},
+ {id:'kafka',lane:'proj',parent:'now',k:2026.6,yr:'2026',when:'2026',kind:{en:'Lab',es:'Laboratorio'},
+  title:'Kafka Lab',org:{en:'Debugger-guided, from send() to Streams',es:'Guiado con el depurador, de send() a Streams'},
   sum:{en:'14 hands-on labs on real Docker clusters. My first contact with Kafka was at EPAM; this lab builds on it.',es:'14 laboratorios prácticos sobre clústeres reales en Docker. Mi primer contacto con Kafka fue en EPAM; este laboratorio parte de ahí.'},
-  did:{en:['Clusters: KRaft single node, KRaft 3 controllers + 3 brokers, and ZooKeeper to compare.','Producers, partitions, consumer groups, delivery guarantees, replication, transactions and compaction.','Spring Kafka, transactional outbox, idempotent consumers, retries with dead-letter topics and Kafka Streams.','CI with Testcontainers on GitHub Actions.'],es:['Clústeres: KRaft de 1 nodo, KRaft con 3 controllers + 3 brokers, y ZooKeeper para comparar.','Producers, particiones, consumer groups, garantías de entrega, replicación, transacciones y compactación.','Spring Kafka, outbox transaccional, consumidores idempotentes, reintentos con dead-letter topics y Kafka Streams.','CI con Testcontainers en GitHub Actions.']},
-  stack:['Java 21','Spring Boot 3.5','Kafka 4.0','Kafka Streams','Testcontainers','Docker'],skills:['kafka','java','testing','arch'],repo:{n:'ipereto/kafka-demo',s:'private'},rel:['epam']}
+  did:{en:['KRaft and ZooKeeper clusters to compare.','Partitions, consumer groups, guarantees, replication, transactions.','Outbox, idempotent consumers, retries with DLT, Kafka Streams.','CI with Testcontainers.'],es:['Clústeres KRaft y ZooKeeper para comparar.','Particiones, consumer groups, garantías, replicación, transacciones.','Outbox, consumidores idempotentes, reintentos con DLT, Kafka Streams.','CI con Testcontainers.']},
+  stack:['Java 21','Spring Boot 3.5','Kafka 4.0','Testcontainers'],tech:['kafka','java','testing'],soft:['learning','quality'],repo:{n:'ipereto/kafka-demo',s:'private'},rel:['epam']},
+ {id:'now',ownTags:true,lane:'proj',k:2026.0,end:null,yr:'2026',when:{en:'2026 – present · alongside my job',es:'2026 – hoy · en paralelo a mi trabajo'},kind:{en:'In progress',es:'En curso'},flag:true,
+  title:{en:'Upskilling: agentic software development',es:'Upskilling: desarrollo de software agéntico'},org:{en:'Personal career development',es:'Desarrollo de carrera personal'},
+  sum:{en:'Self-directed upskilling as a personal career plan, by experimenting with my current projects and repos.',es:'Upskilling autónomo como plan de carrera personal, experimentando con mis proyectos y repos actuales.'},
+  stack:['Java','Spring Boot','Quarkus',{en:'Software architecture',es:'Arquitectura de software'},{en:'Technical judgment',es:'Criterio técnico'},{en:'Clean code',es:'Código limpio'},'CI/CD','Kiro','Claude Code','Agentic AI','Skills','Automation','GitHub Actions'],tech:['java','sdd','ai','testing'],soft:['quality','learning']}
 ];
 const byId=Object.fromEntries(IT.map(i=>[i.id,i]));
-/* evidence links: work -> projects and back */
 IT.forEach(i=>{(i.rel||[]).forEach(r=>{const o=byId[r];if(o){o.rel=o.rel||[];if(!o.rel.includes(i.id))o.rel.push(i.id);}});});
+IT.forEach(i=>{if(i.parent){const p=byId[i.parent];(p.kids=p.kids||[]).push(i);}});
+IT.forEach(i=>{if(i.kids)i.kids.sort((a,b)=>a.k-b.k);const all=i.ownTags?[i]:[i].concat((i.kids||[]).filter(k=>k.lane===i.lane));i.aStack=[...new Set(all.flatMap(x=>x.stack||[]))];i.aSoft=[...new Set(all.flatMap(x=>x.soft||[]))];i.span=(i.kids||[]).some(k=>k.lane!==i.lane);});
+const whenOf=i=>typeof i.when==='string'?i.when:t(i.when);
 
-/* ---------------- render: nav, hero ---------------- */
+/* ---------------- hero ---------------- */
+function stripHtml(){
+  const X=k=>40+(Math.min(k,2027)-2012)/15*920;const Y={edu:34,work:74,proj:114};let o='';
+  for(let y=2012;y<=2026;y+=2)o+='<line class="sg" x1="'+X(y)+'" x2="'+X(y)+'" y1="16" y2="128"/><text class="sy" x="'+X(y)+'" y="148" text-anchor="middle">'+y+'</text>';
+  ['edu','work','proj'].forEach(l=>{o+='<line class="sl '+l+'" x1="40" x2="960" y1="'+Y[l]+'" y2="'+Y[l]+'"/>';});
+  let d=.1;
+  [...IT].sort((a,b)=>((a.end!==undefined?0:1)-(b.end!==undefined?0:1))||a.k-b.k).forEach(i=>{const x=X(i.k),y=Y[i.lane];d+=.07;const ttl='<title>'+t(i.title)+' · '+whenOf(i)+'</title>';
+    if(i.end!==undefined){const e=i.end===null?2026.9:i.end;o+='<g class="sb '+i.lane+'" data-go="'+i.id+'" style="--d:'+d.toFixed(2)+'s">'+ttl+'<rect x="'+x.toFixed(1)+'" y="'+(y-7)+'" width="'+Math.max(8,X(e)-x).toFixed(1)+'" height="14" rx="7"/></g>';}
+    else o+='<g class="sb isdot '+i.lane+'" data-go="'+i.id+'" style="--d:'+d.toFixed(2)+'s">'+ttl+'<circle class="dot" cx="'+x.toFixed(1)+'" cy="'+y+'" r="7"/></g>';});
+  const ln=t(S.lanes);
+  return '<div class="strip"><div class="strip-head"><span class="eyebrow">'+t(S.stripT)+'</span>'+['edu','work','proj'].map((l,k)=>'<span class="dotk"><i class="'+l+'"></i>'+ln[k]+'</span>').join('')+'</div><div class="svgwrap"><svg viewBox="0 0 1000 156" role="img" aria-label="'+t(S.stripT)+'">'+o+'</svg></div></div>';
+}
 function renderStatic(){
   document.documentElement.lang=L;
   document.querySelectorAll('.lang button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.l===L));
   $('#nav').innerHTML=t(S.nav).map(([id,l])=>'<a href="#'+id+'">'+l+'</a>').join('');
-  $('#hero').innerHTML='<div><p class="avail"><i></i>'+t(S.avail)+'</p><p class="eyebrow">'+t(S.hello)+'</p><h1>Iván Felipe <em>Pérez</em> Torres</h1><p class="role">'+t(S.role)+'</p><p class="lead">'+t(S.lead)+'</p><div class="cta"><a class="btn primary" href="#journey">'+t(S.cta1)+'</a><a class="btn" href="'+GH+'ipereto" target="_blank" rel="noopener">'+t(S.cta2)+' ↗</a></div></div>'
-   +'<div class="facts">'+t(S.facts).map(f=>'<div class="fact"><b>'+f[0]+'</b><span>'+f[1]+'</span></div>').join('')+'</div>'+stripHtml();
+  $('#hero').innerHTML='<div><div class="hmeta"><span class="avail"><i></i>'+t(S.avail)+'</span><span class="mi city"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Medellín, Colombia</span><span class="mi lng">'+GLOBE+t(S.spoken)+'</span></div><p class="eyebrow">'+t(S.hello)+'</p><h1>Iván Felipe <em>Pérez</em> Torres</h1><p class="role">'+t(S.role)+'</p><p class="lead">'+t(S.lead)+'</p><div class="route"><div class="step now">'+toolSvg()+'<div><b>'+t(S.todayL)+'</b><span>'+t(S.now)+'</span></div></div><span class="rarrow" aria-hidden="true">→</span><div class="step goal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg><div><b>'+t(S.goalL)+'</b><span>'+t(S.goal)+'</span></div></div></div><div class="cta"><a class="btn primary" href="#journey">'+t(S.cta1)+'</a><a class="btn" href="https://www.linkedin.com/in/ivanfelipepereztorres/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true" width="16" height="16"><rect x="2" y="2" width="20" height="20" rx="4" fill="currentColor"/><path d="M7 10v7M7 7v.01M11 17v-4a2 2 0 0 1 4 0v4M11 10v7" stroke="var(--bg)" stroke-width="2" stroke-linecap="round" fill="none"/></svg>LinkedIn ↗</a><a class="btn" href="'+GH+'ipereto" target="_blank" rel="noopener">'+t(S.cta2)+' ↗</a></div></div>'
+   +'<div class="facts">'+t(S.facts).map(f=>'<div class="fact"><b>'+f[0]+'</b><span>'+f[1]+'</span></div>').join('')+'</div>'
+   +'<div class="brief"><span class="bh">'+t(S.sTitle)+'</span>'+TIERS.map((list,k)=>'<div class="row"><span class="rt"><span class="lvl">'+[0,1,2].map(n=>'<i class="'+(n<3-k?'on':'')+'"></i>').join('')+'</span>'+t(S.tiers)[k][0]+'<small>'+t(S.tiers)[k][1]+'</small></span><span class="bt">'+list.map(s=>'<span>'+s+'</span>').join('')+'</span></div>').join('')+'</div>'+stripHtml();
   $('#jHead').innerHTML='<p class="eyebrow">'+t(S.jEyebrow)+'</p><h2>'+t(S.jTitle)+'</h2><p>'+t(S.jText)+'</p>';
   const ln=t(S.lanes);
-  $('#jLegend').innerHTML='<span><i class="edu"></i>'+ln[0]+'</span><span><i class="work"></i>'+ln[1]+'</span><span><i class="proj"></i>'+ln[2]+'</span><button type="button" class="expand" id="expandAll" aria-pressed="'+allOpen+'">'+t(allOpen?S.collapse:S.expand)+'</button>';
+  $('#jLegend').innerHTML='<span><i class="edu"></i>'+ln[0]+'</span><span><i class="work"></i>'+ln[1]+'</span><span><i class="proj"></i>'+ln[2]+'</span><span><i class="tk"></i>'+t(S.tagTech)+'</span><span><i class="sk"></i>'+t(S.tagSoft)+'</span><button type="button" class="expand" id="expandAll" aria-pressed="'+allOpen+'">'+t(allOpen?S.collapse:S.expand)+'</button>';
   $('#lanesHead').innerHTML='<div></div><div class="edu">'+ln[0]+'</div><div class="work">'+ln[1]+'</div><div class="proj">'+ln[2]+'</div>';
+  $('#softHead').innerHTML='<p class="eyebrow">'+t(S.softEyebrow)+'</p><h2>'+t(S.softTitle)+'</h2><p>'+t(S.softText)+'</p>';
   $('#pHead').innerHTML='<p class="eyebrow">'+t(S.pEyebrow)+'</p><h2>'+t(S.pTitle)+'</h2><p>'+t(S.pText)+'</p>';
-  $('#sHead').innerHTML='<p class="eyebrow">'+t(S.sEyebrow)+'</p><h2>'+t(S.sTitle)+'</h2><p>'+t(S.sText)+'</p>';
-  $('#cHead').innerHTML='<p class="eyebrow">'+t(S.cEyebrow)+'</p><h2>'+t(S.cTitle)+'</h2><p>'+t(S.cText)+'</p>';
-  $('#contactLinks').innerHTML='<div class="cbox"><p class="avail" style="margin:0"><i></i>'+t(S.avail)+'</p><p class="big">'+t(S.cBig)+'</p><div class="cta" style="margin:0"><a class="btn primary" href="'+GH+'ipereto" target="_blank" rel="noopener">GitHub · ipereto ↗</a><a class="btn" href="#journey">'+t(S.cta1)+'</a></div></div>';
-  $('#spoken').textContent=t(S.spoken);
+  
   $('#foot').textContent='© 2026 Iván Felipe Pérez Torres · '+t(S.foot);
 }
 
 /* ---------------- journey ---------------- */
-let skill=null,openId=null,allOpen=false;
-function stripHtml(){
-  const X=k=>40+(Math.min(k,2027)-2010)/17*920;const Y={edu:34,work:74,proj:114};let o='';
-  for(let y=2010;y<=2026;y+=2)o+='<line class="sg" x1="'+X(y)+'" x2="'+X(y)+'" y1="16" y2="128"/><text class="sy" x="'+X(y)+'" y="148" text-anchor="middle">'+y+'</text>';
-  ['edu','work','proj'].forEach(l=>{o+='<line class="sl '+l+'" x1="40" x2="960" y1="'+Y[l]+'" y2="'+Y[l]+'"/>';});
-  let d=.1;
-  [...IT].sort((a,b)=>a.k-b.k).forEach(i=>{const x=X(i.k),y=Y[i.lane];d+=.07;const ttl='<title>'+t(i.title)+' · '+(typeof i.when==='string'?i.when:t(i.when))+'</title>';
-    if(i.end!==undefined){const e=i.end===null?2026.9:i.end;o+='<g class="sb '+i.lane+'" data-go="'+i.id+'" style="--d:'+d.toFixed(2)+'s">'+ttl+'<rect class="bar" x="'+x.toFixed(1)+'" y="'+(y-7)+'" width="'+Math.max(8,X(e)-x).toFixed(1)+'" height="14" rx="7"/></g>';}
-    else o+='<g class="sb isdot '+i.lane+'" data-go="'+i.id+'" style="--d:'+d.toFixed(2)+'s">'+ttl+'<circle class="dot" cx="'+x.toFixed(1)+'" cy="'+y+'" r="7"/></g>';});
-  const ln=t(S.lanes);
-  return '<div class="strip"><div class="strip-head"><span class="eyebrow">'+t(S.stripT)+'</span><span class="sk"><i class="edu"></i>'+ln[0]+'</span><span class="sk"><i class="work"></i>'+ln[1]+'</span><span class="sk"><i class="proj"></i>'+ln[2]+'</span></div><div class="svgwrap"><svg viewBox="0 0 1000 156" role="img" aria-label="'+t(S.stripT)+'">'+o+'</svg></div></div>';
-}
+let filt=null,openId=null,allOpen=false;
+const hasF=(i,f)=>!!f&&((f.type==='t'&&i.tech.includes(f.k))||(f.type==='s'&&i.soft.includes(f.k)));
 function repoHtml(r){if(!r)return '';const st={public:S.public,private:S.private,pending:S.pending}[r.s];
   const name=r.n?(r.s==='public'?'<a href="'+GH+r.n+'" target="_blank" rel="noopener">'+r.n+' ↗</a>':r.n):'—';
   return '<span class="repo">'+name+' <span class="st '+r.s+'">'+t(st)+'</span></span>';}
+const techTags=(i,max)=>{const s=i.stack||[];const v=s.slice(0,max).map(x=>'<span class="tt">'+t(x)+'</span>').join('');return v+(s.length>max?'<span class="tt">+'+(s.length-max)+'</span>':'');};
+const softTags=i=>(i.soft||[]).map(k=>'<span class="ts">'+ico(k)+t(SS[k].l)+'</span>').join('');
 function itemHtml(i){
   const did=t(i.did)||[];const rel=(i.rel||[]).map(r=>byId[r]).filter(Boolean);
-  return '<div class="item '+i.lane+'" data-id="'+i.id+'">'
-   +'<div class="when"><span class="tag">'+t(i.kind)+'</span>'+t(i.when)+'</div>'
-   +'<h3><button type="button" class="ihead" aria-expanded="'+(openId===i.id)+'">'+t(i.title)+'</button></h3><div class="org">'+t(i.org)+'</div>'
-   +(t(i.sum)?'<p class="sum">'+t(i.sum)+'</p>':'')
+  const ken=(i.kind&&i.kind.en)||'';
+  return '<div class="item '+i.lane+(i.flag?' next':'')+(i.parent?' kid':'')+(i.repo?' deliv':'')+(i.parent&&i.lane==='work'&&byId[i.parent].lane==='work'?' inner':'')+(ken==='Degree'?' dip':'')+(/^Certificate/.test(ken)?' cert':'')+(i.kids?' box':'')+'" data-id="'+i.id+'">'
+   +(ken==='Degree'&&i.honors?'<span class="seal"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 14l-3 8 4-2 2 3 1-7M16 14l3 8-4-2-2 3-1-7" fill="currentColor" opacity=".55"/><path d="M12 1.5l1.9 1.6 2.4-.5.9 2.3 2.3.9-.5 2.4 1.6 1.9-1.6 1.9.5 2.4-2.3.9-.9 2.3-2.4-.5L12 18.5l-1.9-1.6-2.4.5-.9-2.3-2.3-.9.5-2.4L3.4 10l1.6-1.9-.5-2.4 2.3-.9.9-2.3 2.4.5z" fill="currentColor"/><circle cx="12" cy="10" r="4.6" fill="var(--surface)"/><path d="M12 7.4l.8 1.7 1.8.2-1.3 1.2.4 1.8-1.7-.9-1.7.9.4-1.8-1.3-1.2 1.8-.2z" fill="currentColor"/></svg>'+t({en:'With honors',es:'Con honores'})+'</span>':'')
+   +(i.repo?'<span class="ftab '+i.repo.s+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>'+t({public:S.public,private:S.private,pending:S.pending}[i.repo.s])+'</span>':'')
+   +'<div class="when">'+(i.kind||i.flag?'<span class="tag">'+(i.flag?toolSvg():'')+t(i.kind)+'</span>':'')+whenOf(i)+'</div>'
+   +'<h3><button type="button" class="ihead" aria-expanded="false">'+t(i.title)+'</button></h3><div class="org">'+t(i.org)+'</div>'
+   +(i.kids&&t(i.sum)?'<p class="csum">'+t(i.sum)+'</p>':'')
+   +'<div class="tags">'+techTags({stack:i.aStack},99)+softTags({soft:i.aSoft})+'</div>'
+   +(i.kids?'<div class="kmore"><span class="o">'+t({en:'Show what it includes',es:'Ver lo que incluye'})+' ('+i.kids.length+')</span><span class="c">'+t({en:'Hide',es:'Ocultar'})+'</span></div>':'')
+   +(i.kids?(i.span?'<div class="kids split"><div class="kcol">'+i.kids.filter(k=>k.lane===i.lane).map(itemHtml).join('')+'</div><div class="kcol kw">'+i.kids.filter(k=>k.lane!==i.lane).map(itemHtml).join('')+'</div></div>':'<div class="kids">'+i.kids.map(itemHtml).join('')+'</div>'):'')
    +'<div class="detail">'
+     +(t(i.sum)&&!i.kids?'<p class="sum">'+t(i.sum)+'</p>':'')
      +(did.length?'<div><div class="lbl">'+t(S.did)+'</div><ul>'+did.map(d=>'<li>'+d+'</li>').join('')+'</ul></div>':'')
      +(t(i.learned)?'<div><div class="lbl">'+t(S.learned)+'</div><p>'+t(i.learned)+'</p></div>':'')
-     +(i.stack&&i.stack.length?'<div><div class="lbl">'+t(S.tech)+'</div><div class="stack">'+i.stack.map(s=>'<span>'+s+'</span>').join('')+'</div></div>':'')
      +(i.repo?'<div>'+repoHtml(i.repo)+'</div>':'')
      +(rel.length?'<div><div class="lbl">'+t(S.rel)+'</div><div class="links">'+rel.map(r=>'<button type="button" class="jump" data-go="'+r.id+'">'+t(r.title)+' →</button>').join('')+'</div></div>':'')
    +'</div></div>';
 }
 function renderJourney(){
-  const rows=[...IT].sort((a,b)=>a.k-b.k);const groups=[];
+  const rows=IT.filter(i=>!i.parent).sort((a,b)=>a.k-b.k);const groups=[];
   rows.forEach(i=>{const y=t(i.yr);let g=groups[groups.length-1];if(!g||g.y!==y){g={y,items:[]};groups.push(g);}g.items.push(i);});
-  $('#journeyRows').innerHTML=groups.map(g=>'<div class="jrow"><div class="yr">'+g.y+'</div>'+['edu','work','proj'].map(l=>{const its=g.items.filter(i=>i.lane===l);
-    return '<div class="lane '+l+(its.length?'':' empty')+'">'+its.map(itemHtml).join('<div style="height:10px"></div>')+'</div>';}).join('')+'</div>').join('');
-  applySkill();
+  const cell=(l,its,x)=>'<div class="lane '+l+(x||'')+(its.length?'':' empty')+'">'+its.map(itemHtml).join('')+'</div>';
+  $('#journeyRows').innerHTML=groups.map(g=>{const by=l=>g.items.filter(i=>i.lane===l);const sp=g.items.some(i=>i.span);
+    return '<div class="jrow"><div class="yr">'+g.y+'</div>'+(sp?cell('edu',by('edu').concat(by('work')),' spancell')+cell('proj',by('proj')):['edu','work','proj'].map(l=>cell(l,by(l))).join(''))+'</div>';}).join('');
+  applyFilter();
 }
-function applySkill(){
-  document.querySelectorAll('#journeyRows .item').forEach(el=>{const i=byId[el.dataset.id];
-    const hit=skill&&i.skills.includes(skill);el.classList.toggle('dim',!!skill&&!hit);el.classList.toggle('hit',!!hit);const op=allOpen||openId===i.id;el.classList.toggle('open',op);const hb=el.querySelector('.ihead');if(hb)hb.setAttribute('aria-expanded',op);});
+function applyFilter(){
+  document.querySelectorAll('#journeyRows .item').forEach(el=>{const i=byId[el.dataset.id];const hit=hasF(i,filt)||(i.kids||[]).some(k=>hasF(k,filt));
+    el.classList.toggle('dim',!!filt&&!hit);el.classList.toggle('hit',hit);
+    const op=allOpen||openId===i.id||(i.kids||[]).some(k=>k.id===openId||(!!filt&&hasF(k,filt)));el.classList.toggle('open',op);const hb=el.querySelector('.ihead');if(hb)hb.setAttribute('aria-expanded',op);});
   renderEvidence();
 }
-function renderChips(){
-  $('#skillChips').innerHTML='<button type="button" class="chip" data-s="" aria-pressed="'+(!skill)+'">'+t(S.all)+'</button>'+Object.keys(SK).map(k=>'<button type="button" class="chip" data-s="'+k+'" aria-pressed="'+(skill===k)+'">'+t(SK[k])+'<span class="cnt">'+IT.filter(i=>i.skills.includes(k)).length+'</span></button>').join('');
+function renderFilters(){
+  const cnt=(type,k)=>IT.filter(i=>hasF(i,{type,k})).length;
+  const pressed=(type,k)=>!!filt&&filt.type===type&&filt.k===k;
+  $('#filters').innerHTML='<div class="fgroup"><span class="flabel">'+t(S.fTech)+'</span><div class="chips"><button type="button" class="chip" data-type="" aria-pressed="'+(!filt)+'">'+t(S.all)+'</button>'
+    +Object.keys(TK).map(k=>'<button type="button" class="chip" data-type="t" data-k="'+k+'" aria-pressed="'+pressed('t',k)+'">'+t(TK[k])+'<span class="cnt">'+cnt('t',k)+'</span></button>').join('')+'</div></div>'
+    +'<div class="fgroup"><span class="flabel">'+t(S.fSoft)+'</span><div class="chips">'+Object.keys(SS).map(k=>'<button type="button" class="chip soft" data-type="s" data-k="'+k+'" aria-pressed="'+pressed('s',k)+'">'+ico(k)+t(SS[k].l)+'<span class="cnt">'+cnt('s',k)+'</span></button>').join('')+'</div></div>';
 }
 function renderEvidence(){
   const box=$('#evidence');
-  if(!skill){box.innerHTML='<div class="ev" style="grid-column:1/-1"><p class="gap">'+t(S.pickSkill)+'</p></div>';return;}
-  const col=(lane,label,cls)=>{const its=IT.filter(i=>i.lane===lane&&i.skills.includes(skill));
-    return '<div class="ev '+cls+'"><span class="k">'+t(label)+'</span>'+(its.length?'<ul>'+its.map(i=>'<li>'+t(i.title)+' <span style="color:var(--ink-2)">· '+(typeof i.when==='string'?i.when:t(i.when))+'</span></li>').join('')+'</ul>':'<p class="gap">'+(lane==='proj'?t(S.gapNext):t(S.evNone))+'</p>')+'</div>';};
-  box.innerHTML=col('edu',S.evEdu,'edu')+col('work',S.evWork,'work')+col('proj',S.evProj,'proj');
+  if(!filt){box.innerHTML='<div class="ev" style="grid-column:1/-1"><p class="gap">'+t(S.pickSkill)+'</p></div>';return;}
+  const col=(lane,label)=>{const its=IT.filter(i=>i.lane===lane&&hasF(i,filt));
+    return '<div class="ev '+lane+'"><span class="k">'+t(label)+'</span>'+(its.length?'<ul>'+its.map(i=>'<li>'+t(i.title)+' <span style="color:var(--ink-2)">· '+whenOf(i)+'</span></li>').join('')+'</ul>':'<p class="gap">'+(lane==='proj'&&filt.type==='t'?t(S.gapNext):'—')+'</p>')+'</div>';};
+  box.innerHTML=col('edu',S.evEdu)+col('work',S.evWork)+col('proj',S.evProj);
 }
-function openItem(id,scroll){openId=openId===id&&!scroll?null:id;applySkill();if(scroll&&openId){const el=document.querySelector('.item[data-id="'+id+'"]');if(el)el.scrollIntoView({behavior:REDUCED?'auto':'smooth',block:'nearest'});}}
-$('#journeyRows').addEventListener('click',e=>{const j=e.target.closest('.jump');if(j){e.stopPropagation();openItem(j.dataset.go,true);return;}if(e.target.closest('a'))return;const b=e.target.closest('.item');if(b)openItem(b.dataset.id,false);});
-$('#jLegend').addEventListener('click',e=>{if(!e.target.closest('#expandAll'))return;allOpen=!allOpen;if(!allOpen)openId=null;const b=$('#expandAll');b.textContent=t(allOpen?S.collapse:S.expand);b.setAttribute('aria-pressed',allOpen);applySkill();});
-$('#hero').addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g){skill=null;renderChips();openItem(g.dataset.go,true);}});
-$('#pgrid').addEventListener('click',e=>{const b=e.target.closest('.seej');if(b){skill=null;renderChips();openItem(b.dataset.go,true);}});
-$('#journeyRows').addEventListener('keydown',e=>{const j=e.target.closest('.jump');if(j&&(e.key==='Enter'||e.key===' ')){e.preventDefault();e.stopPropagation();openItem(j.dataset.go,true);}});
-$('#skillChips').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;skill=b.dataset.s||null;renderChips();applySkill();});
+function setFilter(f){filt=f;renderFilters();applyFilter();}
+function openItem(id,scroll){openId=openId===id&&!scroll?((byId[id]&&byId[id].parent)||null):id;applyFilter();if(scroll&&openId){const el=document.querySelector('.item[data-id="'+id+'"]');if(el)el.scrollIntoView({behavior:REDUCED?'auto':'smooth',block:'center'});}}
+$('#journeyRows').addEventListener('click',e=>{const j=e.target.closest('.jump');if(j){openItem(j.dataset.go,true);return;}if(e.target.closest('a'))return;const b=e.target.closest('.item');if(b)openItem(b.dataset.id,false);});
+$('#filters').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;setFilter(b.dataset.type?{type:b.dataset.type,k:b.dataset.k}:null);});
+$('#jLegend').addEventListener('click',e=>{if(!e.target.closest('#expandAll'))return;allOpen=!allOpen;if(!allOpen)openId=null;const b=$('#expandAll');b.textContent=t(allOpen?S.collapse:S.expand);b.setAttribute('aria-pressed',allOpen);applyFilter();});
+$('#hero').addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g){setFilter(null);openItem(g.dataset.go,true);}});
+
+/* ---------------- soft skills tiles ---------------- */
+function renderSoft(){
+  $('#sgrid').innerHTML=Object.keys(SS).map(k=>{const its=IT.filter(i=>i.soft.includes(k)).sort((a,b)=>a.k-b.k);
+    return '<button type="button" class="stile" data-k="'+k+'"><span class="ico">'+ico(k)+'</span><h4>'+t(SS[k].l)+'</h4><p>'+t(SS[k].d)+'</p><span class="edots" aria-label="'+its.length+' '+t(S.places)+'">'+its.map(i=>'<i class="'+i.lane+'" title="'+t(i.title)+'"></i>').join('')+'<span>'+its.length+'</span></span></button>';}).join('');
+}
+$('#sgrid').addEventListener('click',e=>{const b=e.target.closest('.stile');if(!b)return;setFilter({type:'s',k:b.dataset.k});document.getElementById('journey').scrollIntoView({behavior:REDUCED?'auto':'smooth'});});
 
 /* ---------------- players ---------------- */
 const IC={play:'<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9-5.5z"/></svg>',pause:'<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 2.5h3v11h-3zM9.5 2.5h3v11h-3z"/></svg>',step:'<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 2.5v11l7-5.5zM10.5 2.5h3v11h-3z"/></svg>',reset:'<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.4 8A5.4 5.4 0 1 1 8 2.6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M7 .4l3.6 2.2L7 4.8z"/></svg>'};
@@ -562,44 +742,40 @@ function player(host,h,label){
   host.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b)return;h[b.dataset.a]();});
   draw();return {set(s){st=s;draw();},get st(){return st;},redraw:draw};
 }
-
-/* journey tour */
 const order=[...IT].sort((a,b)=>a.k-b.k).map(i=>i.id);
 let tourIdx=-1,tourTimer=null;
 const tour=player($('#jTools'),{
   m(){if(tour.st==='playing'){clearInterval(tourTimer);tour.set('paused');}else{if(tour.st==='done')tourIdx=-1;tour.set('playing');tourNext();tourTimer=setInterval(tourNext,2600);}},
   s(){clearInterval(tourTimer);if(tour.st==='done')tourIdx=-1;tour.set('paused');tourNext();},
-  r(){clearInterval(tourTimer);tourIdx=-1;openId=null;applySkill();tour.set('idle');}
+  r(){clearInterval(tourTimer);tourIdx=-1;openId=null;applyFilter();tour.set('idle');}
 },S.tour);
-function tourNext(){tourIdx++;if(tourIdx>=order.length){clearInterval(tourTimer);tour.set('done');return;}skill=null;renderChips();openItem(order[tourIdx],true);if(tourIdx===order.length-1&&tour.st==='playing'){clearInterval(tourTimer);setTimeout(()=>tour.set('done'),2600);}}
+function tourNext(){tourIdx++;if(tourIdx>=order.length){clearInterval(tourTimer);tour.set('done');return;}if(filt)setFilter(null);openItem(order[tourIdx],true);if(tourIdx===order.length-1&&tour.st==='playing'){clearInterval(tourTimer);setTimeout(()=>tour.set('done'),2600);}}
 
 /* ---------------- Kafka feature ---------------- */
 const NS='http://www.w3.org/2000/svg';
 const KI={
- prod:{en:'<b>Producer</b> · sends each order with a key. The key decides the partition, so all events for the same key stay in order.',es:'<b>Producer</b> · envía cada pedido con una key. La key decide la partición, así todos los eventos de una misma key mantienen su orden.'},
- topic:{en:'<b>Topic with 3 partitions</b> · an append-only log. Each event gets an offset and stays there after it is read, so it can be replayed.',es:'<b>Topic con 3 particiones</b> · un log de solo escritura al final. Cada evento recibe un offset y sigue ahí después de leerse, así que se puede reprocesar.'},
- c1:{en:'<b>Consumer 1</b> · part of the billing group. The group splits partitions: this one reads P0 and P1.',es:'<b>Consumer 1</b> · parte del grupo de facturación. El grupo se reparte las particiones: este lee P0 y P1.'},
- c2:{en:'<b>Consumer 2</b> · reads P2. Add consumers and the group rebalances partitions between them.',es:'<b>Consumer 2</b> · lee P2. Si agregas consumers, el grupo rebalancea las particiones entre ellos.'},
- dlt:{en:'<b>Dead-letter topic</b> · a message that keeps failing is retried, then parked here instead of blocking the partition. Labs 11 and 12 cover idempotency and retries.',es:'<b>Dead-letter topic</b> · un mensaje que sigue fallando se reintenta y luego se aparta aquí, en vez de bloquear la partición. Los labs 11 y 12 cubren idempotencia y reintentos.'}
+ prod:{en:'<b>Producer</b> · sends each order with a key. The key decides the partition, so events for the same key stay in order.',es:'<b>Producer</b> · envía cada pedido con una key. La key decide la partición, así los eventos de una misma key mantienen su orden.'},
+ topic:{en:'<b>Topic with 3 partitions</b> · an append-only log. Each event gets an offset and stays there after it is read.',es:'<b>Topic con 3 particiones</b> · un log de solo escritura al final. Cada evento recibe un offset y sigue ahí después de leerse.'},
+ c1:{en:'<b>Consumer 1</b> · part of the billing group; reads P0 and P1.',es:'<b>Consumer 1</b> · parte del grupo de facturación; lee P0 y P1.'},
+ c2:{en:'<b>Consumer 2</b> · reads P2. Add consumers and the group rebalances partitions.',es:'<b>Consumer 2</b> · lee P2. Si agregas consumers, el grupo rebalancea las particiones.'},
+ dlt:{en:'<b>Dead-letter topic</b> · a message that keeps failing is retried, then parked here instead of blocking the partition.',es:'<b>Dead-letter topic</b> · un mensaje que sigue fallando se reintenta y luego se aparta aquí, en vez de bloquear la partición.'}
 };
-const KD={P:[70,128,186],prodOut:[128,140],c1:[486,62],c2:[486,124],dlt:[486,206]};
+const KD={P:[70,128,186]};
 function kSvg(){
-  let o='<defs></defs>';
-  const P=KD.P;
+  let o='';const P=KD.P;
   P.forEach((y,i)=>{o+='<path class="rail" d="M128,140 H150 V'+(y+20)+' H186"/>';o+='<path class="rail" d="M406,'+(y+20)+' H440 V'+(i<2?86:148)+' H486"/>';});
   o+='<path class="rail" d="M557,172 V206"/><path class="rail" d="M628,86 H644 V229 H628"/>';
   o+='<g class="n clk" data-k="prod"><rect x="16" y="110" width="112" height="60" rx="8"/><text class="t" x="72" y="137" text-anchor="middle">Producer</text><text class="s" x="72" y="154" text-anchor="middle">orders-api</text></g>';
   o+='<g class="clk" data-k="topic"><rect class="zone" x="172" y="34" width="248" height="200" rx="10"/><text class="lba" x="186" y="54">topic · orders</text>';
   P.forEach((y,i)=>{o+='<rect class="part" x="186" y="'+y+'" width="220" height="40" rx="6"/><text class="lb" x="196" y="'+(y+25)+'">P'+i+'</text><g id="kc'+i+'"></g>';});
-  o+='</g>';
-  o+='<rect class="zone" x="470" y="34" width="174" height="152" rx="10"/><text class="lba" x="482" y="52">group · billing</text>';
+  o+='</g><rect class="zone" x="470" y="34" width="174" height="152" rx="10"/><text class="lba" x="482" y="52">group · billing</text>';
   o+='<g class="n clk" data-k="c1"><rect x="486" y="62" width="142" height="48" rx="8"/><text class="t" x="557" y="83" text-anchor="middle">consumer 1</text><text class="s" id="kc1t" x="557" y="99" text-anchor="middle">P0 · P1</text></g>';
   o+='<g class="n clk" data-k="c2"><rect x="486" y="124" width="142" height="48" rx="8"/><text class="t" x="557" y="145" text-anchor="middle">consumer 2</text><text class="s" id="kc2t" x="557" y="161" text-anchor="middle">P2</text></g>';
   o+='<g class="n clk dlt" data-k="dlt"><rect x="486" y="206" width="142" height="46" rx="8"/><text class="t" x="557" y="227" text-anchor="middle">orders.DLT</text><text class="s" id="kdlt" x="557" y="243" text-anchor="middle">0</text></g>';
   o+='<g id="kfx" class="fx"></g>';
   return '<svg viewBox="0 0 660 270" role="img" aria-label="Kafka topic with three partitions, a consumer group and a dead-letter topic">'+o+'</svg>';
 }
-function mkPath(pts){let L=0;const seg=[];for(let i=1;i<pts.length;i++){const l=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);seg.push(l);L+=l;}return {pts,seg,len:L||1};}
+function mkPath(pts){let Ln=0;const seg=[];for(let i=1;i<pts.length;i++){const l=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);seg.push(l);Ln+=l;}return {pts,seg,len:Ln||1};}
 function ptAt(P,p){let d=Math.max(0,Math.min(1,p))*P.len;for(let i=0;i<P.seg.length;i++){if(d<=P.seg[i]||i===P.seg.length-1){const f=P.seg[i]?Math.min(1,d/P.seg[i]):0;const a=P.pts[i],b=P.pts[i+1];return [a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f];}d-=P.seg[i];}return P.pts[0];}
 const KP={in:[0,1,2].map(i=>mkPath([[128,140],[150,140],[150,KD.P[i]+20],[186,KD.P[i]+20]])),out:[0,1,2].map(i=>mkPath([[406,KD.P[i]+20],[440,KD.P[i]+20],[440,i<2?86:148],[486,i<2?86:148]])),dlt:[mkPath([[628,86],[644,86],[644,229],[628,229]]),mkPath([[557,172],[557,206]])]};
 const K={t:0,next:0,msgs:[],cells:[[],[],[]],off:[0,0,0],n:0,dlt:0,done:[0,0]};
@@ -640,15 +816,10 @@ let kPlaying=!REDUCED,kVis=false,kPlayer;
 function renderKafka(){
   const i=byId.kafka;
   $('#kafkaFeature').innerHTML='<div style="display:grid;gap:12px;min-width:0"><div class="svgbox" id="kSvg">'+kSvg()+'</div><div class="jtools" id="kTools" style="margin:0"></div><div class="info" id="kInfo" aria-live="polite">'+t(S.kInfo0)+'</div></div>'
-   +'<div style="display:grid;gap:12px;align-content:start;min-width:0"><span class="meta">2026 · '+t(i.kind)+' · '+repoHtml(i.repo)+'</span><h3>'+t(i.title)+'</h3><p>'+t(i.sum)+'</p><ul style="margin:0;padding-left:18px;color:var(--ink-2);font-size:14.5px;display:grid;gap:4px">'+t(i.did).map(d=>'<li>'+d+'</li>').join('')+'</ul><div class="labs">'+['00 cluster','01 producer','02 consumer','03 partitions','04 groups','05 offsets','06 replication','07 transactions','08 compaction','09 Spring Kafka','10 outbox','11 idempotency','12 retries & DLT','13 Streams'].map(x=>'<span>'+x+'</span>').join('')+'</div><div class="stack">'+i.stack.map(s=>'<span>'+s+'</span>').join('')+'</div></div>';
-  kPlayer=player($('#kTools'),{
-    m(){kPlaying=!kPlaying;kPlayer.set(kPlaying?'playing':'paused');},
-    s(){kPlaying=false;kStep(.25);kPlayer.set('paused');},
-    r(){kReset();kPlayer.set(kPlaying?'playing':'paused');}
-  });
+   +'<div style="display:grid;gap:12px;align-content:start;min-width:0"><span class="meta">2026 · '+t(i.kind)+' · '+repoHtml(i.repo)+'</span><h3>'+t(i.title)+'</h3><p>'+t(i.sum)+'</p><div class="labs">'+['00 cluster','01 producer','02 consumer','03 partitions','04 groups','05 offsets','06 replication','07 transactions','08 compaction','09 Spring Kafka','10 outbox','11 idempotency','12 retries & DLT','13 Streams'].map(x=>'<span>'+x+'</span>').join('')+'</div><div class="tags" style="margin:0">'+i.stack.map(s=>'<span class="tt">'+s+'</span>').join('')+softTags(i)+'</div></div>';
+  kPlayer=player($('#kTools'),{m(){kPlaying=!kPlaying;kPlayer.set(kPlaying?'playing':'paused');},s(){kPlaying=false;kStep(.25);kPlayer.set('paused');},r(){kReset();kPlayer.set(kPlaying?'playing':'paused');}});
   kPlayer.set(kPlaying?'playing':'paused');
-  K.msgs.forEach(m=>{m.el=null;});
-  kRender();
+  K.msgs.forEach(m=>{m.el=null;});kRender();
   $('#kSvg').addEventListener('click',e=>{const g=e.target.closest('[data-k]');if(!g)return;document.querySelectorAll('#kSvg .n.sel').forEach(x=>x.classList.remove('sel'));if(g.classList.contains('n'))g.classList.add('sel');$('#kInfo').innerHTML=t(KI[g.dataset.k]);});
   if('IntersectionObserver' in window)new IntersectionObserver(es=>{kVis=es[es.length-1].isIntersecting;}).observe($('#kSvg'));else kVis=true;
 }
@@ -656,23 +827,23 @@ let lastTs=0;
 function frame(ts){const dt=lastTs?Math.min(.05,(ts-lastTs)/1000):0;lastTs=ts;if(kPlaying&&kVis)kStep(dt);requestAnimationFrame(frame);}
 requestAnimationFrame(frame);
 
-/* ---------------- other projects ---------------- */
+/* ---------------- project cards ---------------- */
 function renderProjects(){
-  const ids=['buildear','golia','micro','granja','rtfm','youglish','g11','g10'];
+  const ids=['buildear','golia','granja','rtfm','g11','g10'];
   $('#pgrid').innerHTML=ids.map(id=>{const i=byId[id];
-    return '<article class="pcard '+i.lane+'"><div class="y"><span>'+(typeof i.when==='string'?i.when:t(i.when))+'</span><span class="role-pill">'+t(i.kind)+'</span></div><h4>'+t(i.title)+'</h4><p style="font-size:13.5px">'+t(i.org)+'</p><p>'+t(i.sum)+'</p>'
-     +(t(i.learned)?'<p class="learn">'+t(i.learned)+'</p>':'')
-     +(i.stack&&i.stack.length?'<div class="stack">'+i.stack.map(s=>'<span>'+s+'</span>').join('')+'</div>':'')
+    return '<article class="pcard '+i.lane+'"><div class="y"><span>'+whenOf(i)+'</span><span class="role-pill">'+t(i.kind)+'</span></div><h4>'+t(i.title)+'</h4><p>'+t(i.org)+'</p>'
+     +'<div class="tags" style="margin:0">'+techTags(i,99)+softTags(i)+'</div>'
      +'<div class="pfoot">'+repoHtml(i.repo)+'<button type="button" class="seej" data-go="'+i.id+'">'+t(S.seeJ)+' →</button></div></article>';}).join('');
 }
+$('#pgrid').addEventListener('click',e=>{const b=e.target.closest('.seej');if(b){setFilter(null);openItem(b.dataset.go,true);}});
 
-/* ---------------- skills tiers ---------------- */
+/* ---------------- tech tiers ---------------- */
 const TIERS=[
- ['Java 21','Spring Boot','Microservices','JPA / Hibernate','Flyway','MySQL','SQL Server','Oracle SQL','Unit & integration testing','Code review','Clean architecture','DDD','Git','Scrum / Kanban'],
- ['Redis','AWS (EC2, Kinesis, CloudWatch)','Docker','Datadog','Kibana','GitHub Actions','Testcontainers','Python','Kotlin','Spec-driven development (Kiro)','TypeScript'],
+ ['Java 21','Spring Boot','Microservices','JPA / Hibernate','Flyway','MySQL','SQL Server','Oracle SQL','Testing','Code review','Clean architecture','DDD','Git','Scrum'],
+ ['Spec-Driven Development (Kiro)','Redis','AWS (EC2, Kinesis, CloudWatch)','Docker','Datadog','Kibana','GitHub Actions','Testcontainers','Python','Kotlin','TypeScript'],
  ['Kafka','Quarkus','LLM integration (Spring AI)','Terraform','Kubernetes','System design for the cloud']
 ];
-function renderTiers(){const h=t(S.tiers);$('#tiers').innerHTML=TIERS.map((list,k)=>'<div class="tier"><h4>'+h[k][0]+'</h4><p>'+h[k][1]+'</p><div class="stack">'+list.map(s=>'<span>'+s+'</span>').join('')+'</div></div>').join('');}
+function renderTiers(){const h=t(S.tiers);$('#tiers').innerHTML=TIERS.map((list,k)=>'<div class="tier"><div class="lvl">'+[0,1,2].map(n=>'<i class="'+(n<3-k?'on':'')+'"></i>').join('')+'</div><h4>'+h[k][0]+'</h4><p>'+h[k][1]+'</p><div class="tags" style="margin:0;gap:6px">'+list.map(s=>'<span>'+s+'</span>').join('')+'</div></div>').join('');}
 
 /* ---------------- theme ---------------- */
 const SUN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>';
@@ -684,12 +855,12 @@ try{const th=localStorage.getItem('theme');if(th==='dark'||th==='light')document
 $('#themeBtn').addEventListener('click',()=>{const n=curTheme()==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{localStorage.setItem('theme',n);}catch(e){}drawTheme();});
 if(window.matchMedia)matchMedia('(prefers-color-scheme: dark)').addEventListener('change',drawTheme);
 
-/* ---------------- language ---------------- */
-function renderAll(){renderStatic();renderChips();renderJourney();renderKafka();renderProjects();renderTiers();tour.redraw();drawTheme();}
+/* ---------------- language & scroll ---------------- */
+function renderAll(){renderStatic();renderFilters();renderJourney();renderSoft();renderKafka();renderProjects();tour.redraw();drawTheme();}
 document.querySelector('.lang').addEventListener('click',e=>{const b=e.target.closest('[data-l]');if(!b||b.dataset.l===L)return;L=b.dataset.l;try{localStorage.setItem('lang',L);}catch(err){}
-  const kp=kPlaying;renderAll();kPlaying=kp;kPlayer.set(kp?'playing':'paused');});
+  const kp=kPlaying;renderAll();kPlaying=kp;kPlayer.set(kp?'playing':'paused');onScroll();});
 renderAll();
-const SEC=['journey','projects','skills','contact'];
+const SEC=['journey','soft','projects'];
 function onScroll(){const h=document.documentElement;const p=h.scrollTop/((h.scrollHeight-h.clientHeight)||1);const pr=$('#progress');if(pr)pr.style.width=Math.min(100,p*100).toFixed(2)+'%';
   let cur='';SEC.forEach(id=>{const el=document.getElementById(id);if(el&&el.getBoundingClientRect().top<140)cur=id;});
   document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+cur));}
